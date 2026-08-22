@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { exportCsv, parseCsv } from "./data";
-import { COLUMN_NAMES } from "./types";
+import { COLUMN_NAMES, DISPLAY_COLUMNS, columnLabel } from "./types";
 
 const header = COLUMN_NAMES.map((column) => `"${column}"`).join(",");
 const validRow = [
@@ -19,6 +19,19 @@ const validRow = [
   .join(",");
 
 describe("CSV data boundary", () => {
+  it("uses the requested display order and history label", () => {
+    expect(DISPLAY_COLUMNS.slice(0, 7)).toEqual([
+      "ID",
+      "Action",
+      "Update",
+      "Owner",
+      "Priority",
+      "Project",
+      "Status",
+    ]);
+    expect(columnLabel("Update History")).toBe("Action History");
+  });
+
   it("preserves every source column and row", () => {
     const tasks = parseCsv(`${header}\n${validRow}`);
     expect(tasks).toHaveLength(1);

@@ -15,6 +15,23 @@ export const COLUMN_NAMES = [
 
 export type ColumnName = (typeof COLUMN_NAMES)[number];
 
+export const DISPLAY_COLUMNS: readonly ColumnName[] = [
+  "ID",
+  "Action",
+  "Update",
+  "Owner",
+  "Priority",
+  "Project",
+  "Status",
+  "Email Subject",
+  "Last edited time",
+  "Update History",
+];
+
+export function columnLabel(column: ColumnName): string {
+  return column === "Update History" ? "Action History" : column;
+}
+
 export const CsvRowSchema = z.object({
   Action: z.string(),
   "Email Subject": z.string(),

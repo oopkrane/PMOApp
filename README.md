@@ -11,6 +11,7 @@ A local, Notion-inspired project and action management application. The supplied
 - New actions, deletion, CSV import/export, and drag-and-drop status changes
 - Browser-local persistence with one-click restore of the original import
 - Runtime schema validation for CSV and browser-stored data
+- Local AI Focus board powered by Ollama `qwen3.5:9b`, showing the top three actions per project with evidence-based rationale
 
 ## Run locally
 
@@ -24,6 +25,8 @@ Open the local URL printed by Vite. Generate production assets with `npm run bui
 ## Data handling
 
 The imported data stays in the browser and is never sent to an external service. Edits are stored in `localStorage`. The restore button beside the filters clears edits and reloads `public/data/pmo-actions.csv`.
+
+AI Focus requests are sent only to the local Ollama service at `127.0.0.1:11434`. Start Ollama and ensure `qwen3.5:9b` is installed before generating the focus board.
 
 ## Verification
 

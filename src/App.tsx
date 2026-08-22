@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ArchiveRestore,
   ArrowDownToLine,
+  BrainCircuit,
   CalendarDays,
   Check,
   ChevronDown,
@@ -14,6 +15,7 @@ import {
   MoreHorizontal,
   PanelLeftClose,
   Plus,
+  RefreshCw,
   Search,
   Settings,
   Sparkles,
@@ -30,10 +32,23 @@ import {
   parseCsv,
   saveTasks,
 } from "./data";
-import { COLUMN_NAMES, type ColumnName, type Task } from "./types";
+import { nextSequentialId } from "./ids";
+import {
+  generateProjectInsights,
+  insightModelName,
+  type AiInsightResult,
+} from "./insights";
+import {
+  COLUMN_NAMES,
+  DISPLAY_COLUMNS,
+  columnLabel,
+  type ColumnName,
+  type Task,
+} from "./types";
+import { appendUpdateHistory, createDatedUpdate } from "./updates";
 import "./App.css";
 
-type ViewMode = "table" | "board";
+type ViewMode = "table" | "board" | "insights";
 const completionPattern = /^(complete|completed|done|closed)$/i;
 
 function uniqueValues(tasks: Task[], column: ColumnName): string[] {
@@ -69,16 +84,16 @@ function priorityTone(value: string): string {
   return "gray";
 }
 
-function blankTask(index: number): Task {
+function blankTask(id: string, key: string): Task {
   const empty = Object.fromEntries(
     COLUMN_NAMES.map((column) => [column, ""]),
   ) as Record<ColumnName, string>;
   return {
     ...empty,
     Action: "Untitled action",
-    ID: `NEW-${Date.now().toString().slice(-6)}`,
+    ID: id,
     "Last edited time": new Date().toISOString(),
-    _key: `new-${Date.now()}-${index}`,
+    _key: key,
   };
 }
 
@@ -94,6 +109,12 @@ function App() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notice, setNotice] = useState("");
+  const [insights, setInsights] = useState<AiInsightResult | null>(null);
+  const [insightLoading, setInsightLoading] = useState(false);
+  const [insightError, setInsightError] = useState("");
+  const [insightGeneratedAt, setInsightGeneratedAt] = useState<Date | null>(
+    null,
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -118,6 +139,7 @@ function App() {
   }, [notice]);
 
   const projects = useMemo(() => uniqueValues(tasks, "Project"), [tasks]);
+  const owners = useMemo(() => uniqueValues(tasks, "Owner"), [tasks]);
   const statuses = useMemo(() => uniqueValues(tasks, "Status"), [tasks]);
   const priorities = useMemo(() => uniqueValues(tasks, "Priority"), [tasks]);
   const filteredTasks = useMemo(() => {
@@ -151,6 +173,7 @@ function App() {
   const unassigned = tasks.filter((task) => !task.Owner.trim()).length;
 
   function updateTask(key: string, column: ColumnName, value: string) {
+    invalidateInsights();
     setTasks((current) =>
       current.map((task) =>
         task._key === key
@@ -164,14 +187,40 @@ function App() {
     );
   }
 
+  function addTaskUpdate(key: string, update: string) {
+    const datedUpdate = createDatedUpdate(update);
+    if (!datedUpdate) return;
+    invalidateInsights();
+    setTasks((current) =>
+      current.map((task) =>
+        task._key === key
+          ? {
+              ...task,
+              Update: datedUpdate,
+              "Update History": appendUpdateHistory(
+                task["Update History"],
+                task.Update,
+              ),
+              "Last edited time": new Date().toISOString(),
+            }
+          : task,
+      ),
+    );
+  }
+
   function addTask() {
-    const task = blankTask(tasks.length);
-    if (projectFilter !== "All projects") task.Project = projectFilter;
-    setTasks((current) => [task, ...current]);
-    setSelectedKey(task._key);
+    invalidateInsights();
+    const key = `new-${crypto.randomUUID()}`;
+    setTasks((current) => {
+      const task = blankTask(nextSequentialId(current), key);
+      if (projectFilter !== "All projects") task.Project = projectFilter;
+      return [task, ...current];
+    });
+    setSelectedKey(key);
   }
 
   function deleteTask(key: string) {
+    invalidateInsights();
     setTasks((current) => current.filter((task) => task._key !== key));
     setSelectedKey(null);
     setNotice("Action deleted");
@@ -192,6 +241,7 @@ function App() {
   async function importFile(file: File) {
     try {
       const imported = parseCsv(await file.text());
+      invalidateInsights();
       setTasks(imported);
       setError("");
       setNotice(`${imported.length} actions imported`);
@@ -208,6 +258,7 @@ function App() {
     clearSavedTasks();
     setLoading(true);
     try {
+      invalidateInsights();
       setTasks(await loadSeedTasks());
       setNotice("Original import restored");
     } catch (reason) {
@@ -218,6 +269,29 @@ function App() {
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+  function invalidateInsights() {
+    setInsights(null);
+    setInsightGeneratedAt(null);
+    setInsightError("");
+  }
+
+  async function analyzeTasks() {
+    setInsightLoading(true);
+    setInsightError("");
+    try {
+      setInsights(await generateProjectInsights(tasks));
+      setInsightGeneratedAt(new Date());
+    } catch (reason) {
+      setInsightError(
+        reason instanceof Error
+          ? reason.message
+          : "The local model could not analyze these actions.",
+      );
+    } finally {
+      setInsightLoading(false);
     }
   }
 
@@ -408,6 +482,12 @@ function App() {
                 >
                   <Columns3 size={16} /> Board
                 </button>
+                <button
+                  className={view === "insights" ? "active" : ""}
+                  onClick={() => setView("insights")}
+                >
+                  <BrainCircuit size={16} /> AI Focus
+                </button>
               </div>
               <div className="toolbar-actions">
                 <label className="search-box">
@@ -461,15 +541,27 @@ function App() {
                 tasks={filteredTasks}
                 onSelect={setSelectedKey}
                 onUpdate={updateTask}
+                onAddUpdate={addTaskUpdate}
                 statuses={statuses}
                 priorities={priorities}
               />
-            ) : (
+            ) : view === "board" ? (
               <TaskBoard
                 tasks={filteredTasks}
                 statuses={statuses}
                 onSelect={setSelectedKey}
                 onUpdate={updateTask}
+              />
+            ) : (
+              <AiFocusBoard
+                insights={insights}
+                tasks={tasks}
+                projectFilter={projectFilter}
+                loading={insightLoading}
+                error={insightError}
+                generatedAt={insightGeneratedAt}
+                onAnalyze={() => void analyzeTasks()}
+                onSelect={setSelectedKey}
               />
             )}
           </section>
@@ -485,6 +577,16 @@ function App() {
           onDelete={deleteTask}
         />
       )}
+      <datalist id="owner-options">
+        {owners.map((owner) => (
+          <option key={owner} value={owner} />
+        ))}
+      </datalist>
+      <datalist id="project-options">
+        {projects.map((project) => (
+          <option key={project} value={project} />
+        ))}
+      </datalist>
       {notice && (
         <div className="toast">
           <Check size={16} /> {notice}
@@ -555,12 +657,14 @@ function TaskTable({
   tasks,
   onSelect,
   onUpdate,
+  onAddUpdate,
   statuses,
   priorities,
 }: {
   tasks: Task[];
   onSelect: (key: string) => void;
   onUpdate: (key: string, column: ColumnName, value: string) => void;
+  onAddUpdate: (key: string, update: string) => void;
   statuses: string[];
   priorities: string[];
 }) {
@@ -569,12 +673,12 @@ function TaskTable({
       <table className="task-table">
         <thead>
           <tr>
-            {COLUMN_NAMES.map((column) => (
+            {DISPLAY_COLUMNS.map((column) => (
               <th
                 key={column}
-                className={column === "Action" ? "sticky-column" : ""}
+                className={column === "ID" ? "sticky-column" : ""}
               >
-                {column}
+                {columnLabel(column)}
               </th>
             ))}
           </tr>
@@ -582,11 +686,15 @@ function TaskTable({
         <tbody>
           {tasks.map((task) => (
             <tr key={task._key}>
-              {COLUMN_NAMES.map((column) => (
+              {DISPLAY_COLUMNS.map((column) => (
                 <td
                   key={column}
                   className={
-                    column === "Action" ? "sticky-column action-cell" : ""
+                    column === "ID"
+                      ? "sticky-column"
+                      : column === "Action"
+                        ? "action-cell"
+                        : ""
                   }
                 >
                   {column === "Action" ? (
@@ -597,6 +705,12 @@ function TaskTable({
                       <span className="doc-icon">A</span>
                       {task.Action || "Untitled action"}
                     </button>
+                  ) : column === "Update" ? (
+                    <UpdateCell
+                      value={task.Update}
+                      actionName={task.Action}
+                      onAdd={(update) => onAddUpdate(task._key, update)}
+                    />
                   ) : column === "Status" ? (
                     <select
                       className={`pill-select ${statusTone(task.Status)}`}
@@ -632,12 +746,22 @@ function TaskTable({
                       </span>
                       <input
                         aria-label={`Owner for ${task.Action}`}
+                        list="owner-options"
                         value={task.Owner}
                         onChange={(event) =>
                           onUpdate(task._key, column, event.target.value)
                         }
                       />
                     </div>
+                  ) : column === "Project" ? (
+                    <input
+                      aria-label={`Project for ${task.Action}`}
+                      list="project-options"
+                      value={task.Project}
+                      onChange={(event) =>
+                        onUpdate(task._key, column, event.target.value)
+                      }
+                    />
                   ) : (
                     <input
                       aria-label={`${column} for ${task.Action}`}
@@ -660,6 +784,77 @@ function TaskTable({
           <span>Try adjusting the search or filters.</span>
         </div>
       )}
+    </div>
+  );
+}
+
+function UpdateCell({
+  value,
+  actionName,
+  onAdd,
+}: {
+  value: string;
+  actionName: string;
+  onAdd: (update: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  function submit() {
+    if (!draft.trim()) return;
+    onAdd(draft);
+    setDraft("");
+    setOpen(false);
+  }
+
+  if (!open) {
+    return (
+      <button
+        className={`update-preview ${value ? "" : "empty"}`}
+        aria-label={`Add update for ${actionName}`}
+        data-full-text={value}
+        title={value}
+        onClick={() => setOpen(true)}
+      >
+        <span className="update-preview-text">{value || "+ Add update"}</span>
+      </button>
+    );
+  }
+
+  return (
+    <div className="update-composer">
+      <textarea
+        autoFocus
+        value={draft}
+        placeholder="Type a new update…"
+        aria-label={`New update for ${actionName}`}
+        onChange={(event) => setDraft(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            setDraft("");
+            setOpen(false);
+          }
+          if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            submit();
+          }
+        }}
+      />
+      <div>
+        <span>Ctrl + Enter to add</span>
+        <button
+          type="button"
+          onClick={() => {
+            setDraft("");
+            setOpen(false);
+          }}
+        >
+          Cancel
+        </button>
+        <button type="button" className="add-update" onClick={submit}>
+          Add
+        </button>
+      </div>
     </div>
   );
 }
@@ -737,6 +932,149 @@ function TaskBoard({
   );
 }
 
+function AiFocusBoard({
+  insights,
+  tasks,
+  projectFilter,
+  loading,
+  error,
+  generatedAt,
+  onAnalyze,
+  onSelect,
+}: {
+  insights: AiInsightResult | null;
+  tasks: Task[];
+  projectFilter: string;
+  loading: boolean;
+  error: string;
+  generatedAt: Date | null;
+  onAnalyze: () => void;
+  onSelect: (key: string) => void;
+}) {
+  const taskByKey = new Map(tasks.map((task) => [task._key, task]));
+  const visibleProjects =
+    insights?.projects.filter(
+      (project) =>
+        projectFilter === "All projects" || project.project === projectFilter,
+    ) ?? [];
+
+  if (!insights) {
+    return (
+      <div className="insight-empty">
+        <div className="insight-orbit">
+          <BrainCircuit size={28} />
+        </div>
+        <p className="eyebrow">LOCAL AI PRIORITIZATION</p>
+        <h2>Find the three actions that matter most</h2>
+        <p>
+          {insightModelName} will review priority, status, and recorded updates
+          across all actions. Task data stays on this computer.
+        </p>
+        <button
+          className="primary-button insight-button"
+          disabled={loading}
+          onClick={onAnalyze}
+        >
+          <RefreshCw className={loading ? "spin" : ""} size={16} />
+          {loading ? "Reviewing all actions…" : "Generate focus board"}
+        </button>
+        {error && (
+          <div className="insight-error">
+            <CircleAlert size={15} /> {error}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="ai-focus-wrap">
+      <div className="ai-focus-header">
+        <div>
+          <span>
+            <BrainCircuit size={14} /> AI + priority focus
+          </span>
+          <small>
+            Model insight · {insightModelName}
+            {generatedAt
+              ? ` · Generated ${generatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+              : ""}
+          </small>
+        </div>
+        <button
+          className="secondary-button"
+          disabled={loading}
+          onClick={onAnalyze}
+        >
+          <RefreshCw className={loading ? "spin" : ""} size={14} />
+          {loading ? "Reviewing…" : "Refresh insights"}
+        </button>
+      </div>
+      {error && (
+        <div className="insight-inline-error">
+          <CircleAlert size={15} /> {error}
+        </div>
+      )}
+      <div className="ai-project-grid">
+        {visibleProjects.map((project) => (
+          <section className="ai-project" key={project.project}>
+            <header>
+              <div className="ai-project-icon">
+                {project.project.slice(0, 1).toUpperCase()}
+              </div>
+              <div>
+                <h3>{project.project}</h3>
+                <span>Top {project.actions.length} actions</span>
+              </div>
+            </header>
+            <p className="project-overview">{project.overview}</p>
+            <div className="focus-list">
+              {project.actions.map((insight, index) => {
+                const task = taskByKey.get(insight.key);
+                if (!task) return null;
+                return (
+                  <button
+                    className="focus-card"
+                    key={insight.key}
+                    onClick={() => onSelect(insight.key)}
+                  >
+                    <span className="focus-rank">{index + 1}</span>
+                    <div className="focus-content">
+                      <div className="focus-card-topline">
+                        <div className="focus-labels">
+                          <span
+                            className={`priority-label ${priorityTone(task.Priority)}`}
+                          >
+                            {task.Priority || "No priority"}
+                          </span>
+                          <span
+                            className={`insight-source ${insight.source === "model" ? "model" : "fallback"}`}
+                          >
+                            {insight.source === "model"
+                              ? "AI insight"
+                              : "Priority fallback"}
+                          </span>
+                        </div>
+                        <small>#{task.ID}</small>
+                      </div>
+                      <h4>{task.Action || "Untitled action"}</h4>
+                      <p>{insight.reason}</p>
+                      <div className="next-step">
+                        <strong>Suggested next step</strong>
+                        <span>{insight.nextStep}</span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TaskDrawer({
   task,
   statuses,
@@ -777,10 +1115,10 @@ function TaskDrawer({
             aria-label="Action title"
           />
           <div className="properties">
-            {COLUMN_NAMES.filter((column) => column !== "Action").map(
+            {DISPLAY_COLUMNS.filter((column) => column !== "Action").map(
               (column) => (
                 <label className="property-row" key={column}>
-                  <span>{column}</span>
+                  <span>{columnLabel(column)}</span>
                   {column === "Status" || column === "Priority" ? (
                     <select
                       value={task[column]}
@@ -795,6 +1133,16 @@ function TaskDrawer({
                         ),
                       )}
                     </select>
+                  ) : column === "Owner" || column === "Project" ? (
+                    <input
+                      list={
+                        column === "Owner" ? "owner-options" : "project-options"
+                      }
+                      value={task[column]}
+                      onChange={(event) =>
+                        onUpdate(task._key, column, event.target.value)
+                      }
+                    />
                   ) : column === "Update" || column === "Update History" ? (
                     <textarea
                       value={task[column]}
