@@ -12,6 +12,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   ListFilter,
+  MailCheck,
   MoreHorizontal,
   PanelLeftClose,
   Plus,
@@ -33,11 +34,21 @@ import {
   saveTasks,
 } from "./data";
 import { nextSequentialId } from "./ids";
+import { matchEmailToAction } from "./emailMatcher";
+import {
+  authorizeGmail,
+  confirmGmailAccount,
+  findUnreadProjectEmails,
+  markEmailRead,
+} from "./gmail";
 import {
   generateProjectInsights,
   insightModelName,
+  loadSavedInsights,
+  saveInsights,
   type AiInsightResult,
 } from "./insights";
+import { loadWorkspaceView, saveWorkspaceView } from "./preferences";
 import {
   COLUMN_NAMES,
   DISPLAY_COLUMNS,
@@ -45,11 +56,11 @@ import {
   type ColumnName,
   type Task,
 } from "./types";
-import { appendUpdateHistory, createDatedUpdate } from "./updates";
+import { applyTaskUpdate } from "./updates";
 import "./App.css";
 
-type ViewMode = "table" | "board" | "insights";
 const completionPattern = /^(complete|completed|done|closed)$/i;
+const GMAIL_ACCOUNT = "oopkrane@gmail.com";
 
 function uniqueValues(tasks: Task[], column: ColumnName): string[] {
   return [
@@ -98,10 +109,11 @@ function blankTask(id: string, key: string): Task {
 }
 
 function App() {
+  const [initialInsights] = useState(loadSavedInsights);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [view, setView] = useState<ViewMode>("table");
+  const [view, setView] = useState(loadWorkspaceView);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [priorityFilter, setPriorityFilter] = useState("All priorities");
@@ -109,12 +121,20 @@ function App() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notice, setNotice] = useState("");
-  const [insights, setInsights] = useState<AiInsightResult | null>(null);
+  const [insights, setInsights] = useState<AiInsightResult | null>(
+    initialInsights?.result ?? null,
+  );
   const [insightLoading, setInsightLoading] = useState(false);
   const [insightError, setInsightError] = useState("");
   const [insightGeneratedAt, setInsightGeneratedAt] = useState<Date | null>(
-    null,
+    initialInsights?.generatedAt ?? null,
   );
+  const [insightsStale, setInsightsStale] = useState(
+    initialInsights?.stale ?? false,
+  );
+  const [gmailProcessing, setGmailProcessing] = useState(false);
+  const [gmailStatus, setGmailStatus] = useState("");
+  const [gmailError, setGmailError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -131,6 +151,16 @@ function App() {
   useEffect(() => {
     if (!loading && tasks.length > 0) saveTasks(tasks);
   }, [tasks, loading]);
+
+  useEffect(() => {
+    saveWorkspaceView(view);
+  }, [view]);
+
+  useEffect(() => {
+    if (insights && insightGeneratedAt) {
+      saveInsights(insights, insightGeneratedAt, insightsStale);
+    }
+  }, [insightGeneratedAt, insights, insightsStale]);
 
   useEffect(() => {
     if (!notice) return;
@@ -173,7 +203,7 @@ function App() {
   const unassigned = tasks.filter((task) => !task.Owner.trim()).length;
 
   function updateTask(key: string, column: ColumnName, value: string) {
-    invalidateInsights();
+    markInsightsStale();
     setTasks((current) =>
       current.map((task) =>
         task._key === key
@@ -188,28 +218,17 @@ function App() {
   }
 
   function addTaskUpdate(key: string, update: string) {
-    const datedUpdate = createDatedUpdate(update);
-    if (!datedUpdate) return;
-    invalidateInsights();
+    if (!update.trim()) return;
+    markInsightsStale();
     setTasks((current) =>
       current.map((task) =>
-        task._key === key
-          ? {
-              ...task,
-              Update: datedUpdate,
-              "Update History": appendUpdateHistory(
-                task["Update History"],
-                task.Update,
-              ),
-              "Last edited time": new Date().toISOString(),
-            }
-          : task,
+        task._key === key ? applyTaskUpdate(task, update) : task,
       ),
     );
   }
 
   function addTask() {
-    invalidateInsights();
+    markInsightsStale();
     const key = `new-${crypto.randomUUID()}`;
     setTasks((current) => {
       const task = blankTask(nextSequentialId(current), key);
@@ -220,7 +239,7 @@ function App() {
   }
 
   function deleteTask(key: string) {
-    invalidateInsights();
+    markInsightsStale();
     setTasks((current) => current.filter((task) => task._key !== key));
     setSelectedKey(null);
     setNotice("Action deleted");
@@ -241,7 +260,7 @@ function App() {
   async function importFile(file: File) {
     try {
       const imported = parseCsv(await file.text());
-      invalidateInsights();
+      markInsightsStale();
       setTasks(imported);
       setError("");
       setNotice(`${imported.length} actions imported`);
@@ -258,7 +277,7 @@ function App() {
     clearSavedTasks();
     setLoading(true);
     try {
-      invalidateInsights();
+      markInsightsStale();
       setTasks(await loadSeedTasks());
       setNotice("Original import restored");
     } catch (reason) {
@@ -272,9 +291,8 @@ function App() {
     }
   }
 
-  function invalidateInsights() {
-    setInsights(null);
-    setInsightGeneratedAt(null);
+  function markInsightsStale() {
+    setInsightsStale(true);
     setInsightError("");
   }
 
@@ -284,6 +302,7 @@ function App() {
     try {
       setInsights(await generateProjectInsights(tasks));
       setInsightGeneratedAt(new Date());
+      setInsightsStale(false);
     } catch (reason) {
       setInsightError(
         reason instanceof Error
@@ -292,6 +311,99 @@ function App() {
       );
     } finally {
       setInsightLoading(false);
+    }
+  }
+
+  async function processGmail() {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
+    if (!clientId) {
+      setGmailError(
+        "Google OAuth is not configured. Add VITE_GOOGLE_CLIENT_ID to a local .env file.",
+      );
+      return;
+    }
+
+    setGmailProcessing(true);
+    setGmailError("");
+    setGmailStatus(`Connecting to ${GMAIL_ACCOUNT}…`);
+    try {
+      const accessToken = await authorizeGmail(clientId, GMAIL_ACCOUNT);
+      await confirmGmailAccount(accessToken, GMAIL_ACCOUNT);
+      setGmailStatus(
+        "Finding unread Primary emails with project names in the subject…",
+      );
+      const emails = await findUnreadProjectEmails(
+        accessToken,
+        projects,
+        setGmailStatus,
+      );
+      let workingTasks = tasks;
+      let updated = 0;
+      let created = 0;
+
+      for (let index = 0; index < emails.length; index += 1) {
+        const email = emails[index];
+        if (!email) continue;
+        setGmailStatus(
+          `Matching email ${index + 1} of ${emails.length} locally…`,
+        );
+        const projectTasks = workingTasks.filter(
+          (task) => task.Project === email.project,
+        );
+        const decision = await matchEmailToAction(email, projectTasks);
+
+        await markEmailRead(accessToken, email.messageId);
+        if (decision.kind === "match") {
+          workingTasks = workingTasks.map((task) =>
+            task._key === decision.taskKey
+              ? applyTaskUpdate(
+                  task,
+                  `Email: ${decision.update}`,
+                  email.receivedAt,
+                )
+              : task,
+          );
+          updated += 1;
+        } else {
+          const key = `email-${crypto.randomUUID()}`;
+          let newTask = blankTask(nextSequentialId(workingTasks), key);
+          newTask = {
+            ...newTask,
+            Action: decision.action,
+            "Email Subject": email.subject,
+            Priority: decision.priority,
+            Project: email.project,
+            Status:
+              uniqueValues(workingTasks, "Status").find((status) =>
+                /not started|to do|open/i.test(status),
+              ) ?? "",
+          };
+          newTask = applyTaskUpdate(
+            newTask,
+            `Email: ${decision.update}`,
+            email.receivedAt,
+          );
+          workingTasks = [newTask, ...workingTasks];
+          created += 1;
+        }
+        setTasks(workingTasks);
+      }
+
+      if (updated + created > 0) markInsightsStale();
+      setGmailStatus(
+        emails.length === 0
+          ? "No unread project emails were found in Primary."
+          : `${updated} existing action${updated === 1 ? "" : "s"} updated. ${created} new action${created === 1 ? "" : "s"} created.`,
+      );
+    } catch (reason) {
+      setGmailError(
+        reason instanceof Error
+          ? reason.message
+          : "Gmail processing could not be completed.",
+      );
+      setGmailStatus("");
+    } finally {
+      setGmailProcessing(false);
     }
   }
 
@@ -396,6 +508,18 @@ function App() {
             </strong>
           </div>
           <div className="top-actions">
+            <button
+              className="secondary-button gmail-button"
+              disabled={gmailProcessing}
+              onClick={() => void processGmail()}
+            >
+              {gmailProcessing ? (
+                <RefreshCw className="spin" size={16} />
+              ) : (
+                <MailCheck size={16} />
+              )}
+              {gmailProcessing ? "Processing…" : "Process Gmail"}
+            </button>
             <button
               className="secondary-button"
               onClick={() => fileInputRef.current?.click()}
@@ -560,6 +684,7 @@ function App() {
                 loading={insightLoading}
                 error={insightError}
                 generatedAt={insightGeneratedAt}
+                stale={insightsStale}
                 onAnalyze={() => void analyzeTasks()}
                 onSelect={setSelectedKey}
               />
@@ -598,6 +723,36 @@ function App() {
           <button onClick={() => setError("")}>
             <X size={14} />
           </button>
+        </div>
+      )}
+      {(gmailStatus || gmailError) && (
+        <div className={`gmail-status ${gmailError ? "error" : ""}`}>
+          <div className="gmail-status-icon">
+            {gmailError ? (
+              <CircleAlert size={18} />
+            ) : gmailProcessing ? (
+              <RefreshCw className="spin" size={18} />
+            ) : (
+              <MailCheck size={18} />
+            )}
+          </div>
+          <div>
+            <strong>
+              {gmailError ? "Gmail needs attention" : "Gmail processing"}
+            </strong>
+            <span>{gmailError || gmailStatus}</span>
+          </div>
+          {!gmailProcessing && (
+            <button
+              aria-label="Dismiss Gmail status"
+              onClick={() => {
+                setGmailStatus("");
+                setGmailError("");
+              }}
+            >
+              <X size={15} />
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -939,6 +1094,7 @@ function AiFocusBoard({
   loading,
   error,
   generatedAt,
+  stale,
   onAnalyze,
   onSelect,
 }: {
@@ -948,6 +1104,7 @@ function AiFocusBoard({
   loading: boolean;
   error: string;
   generatedAt: Date | null;
+  stale: boolean;
   onAnalyze: () => void;
   onSelect: (key: string) => void;
 }) {
@@ -1013,6 +1170,13 @@ function AiFocusBoard({
       {error && (
         <div className="insight-inline-error">
           <CircleAlert size={15} /> {error}
+        </div>
+      )}
+      {stale && (
+        <div className="insight-stale-notice">
+          <RefreshCw size={14} />
+          Task data has changed since this board was generated. The previous
+          result is retained; refresh insights when ready.
         </div>
       )}
       <div className="ai-project-grid">

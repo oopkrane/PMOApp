@@ -17,3 +17,19 @@ export function appendUpdateHistory(
 
   return history ? `${history}\n${previous}` : previous;
 }
+
+export function applyTaskUpdate(
+  task: Task,
+  update: string,
+  date = new Date(),
+): Task {
+  const datedUpdate = createDatedUpdate(update, date);
+  if (!datedUpdate) return task;
+  return {
+    ...task,
+    Update: datedUpdate,
+    "Update History": appendUpdateHistory(task["Update History"], task.Update),
+    "Last edited time": new Date().toISOString(),
+  };
+}
+import type { Task } from "./types";

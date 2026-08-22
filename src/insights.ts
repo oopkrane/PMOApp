@@ -41,7 +41,49 @@ const InsightResultSchema = z.object({
   projects: z.array(InsightProjectSchema),
 });
 
+const SavedInsightSchema = z.object({
+  result: InsightResultSchema,
+  generatedAt: z.string().datetime(),
+  stale: z.boolean(),
+});
+
 export type AiInsightResult = z.infer<typeof InsightResultSchema>;
+export type SavedAiInsight = {
+  result: AiInsightResult;
+  generatedAt: Date;
+  stale: boolean;
+};
+
+const INSIGHT_STORAGE_KEY = "pmo-workspace.ai-focus.v1";
+
+export function loadSavedInsights(): SavedAiInsight | null {
+  const saved = window.localStorage.getItem(INSIGHT_STORAGE_KEY);
+  if (!saved) return null;
+  try {
+    const result = SavedInsightSchema.safeParse(JSON.parse(saved) as unknown);
+    if (!result.success) return null;
+    return {
+      result: result.data.result,
+      generatedAt: new Date(result.data.generatedAt),
+      stale: result.data.stale,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function saveInsights(
+  result: AiInsightResult,
+  generatedAt: Date,
+  stale: boolean,
+): void {
+  const saved = SavedInsightSchema.parse({
+    result,
+    generatedAt: generatedAt.toISOString(),
+    stale,
+  });
+  window.localStorage.setItem(INSIGHT_STORAGE_KEY, JSON.stringify(saved));
+}
 
 const outputFormat = {
   type: "object",
