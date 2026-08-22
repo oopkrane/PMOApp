@@ -1,0 +1,945 @@
+﻿Action,Email Subject,ID,Last edited time,Owner,Priority,Project,Status,Update,Update History
+Data feeds: Samples and specs,BW Mascom sample data,7,"August 11, 2026 5:22 PM",Aritra,High,BW Mascom,In progress,"4/8
+Aritra to send latest to Mascom","2026-07-03 16:15 SAST — Updated from email “BW Mascom sample data”: captured Ali’s follow-up on remaining sample data sources and the clarification request about Site Information files (2G/3G/4G/5G consolidation and where network technology is identified).
+
+2026-07-03 12:22 SAST — Updated from email “Re: BW Mascom Data feed samples and specs audit”: Francois requested a summary of outstanding samples and specs be sent to Rale.
+
+2026-07-03 12:21 SAST — Updated from email “Fw: BW Mascom Data feed samples and specs audit”: noted Ali started copying sample data to the shared folder (starting with ASN) and shared links with TV for decoding; remaining sample folders prepared and copying ongoing.
+
+2026-07-03 09:10 SAST — Updated from email “BW Mascom Data feed samples and specs audit”: logged request to audit all feed samples/specs, copy to SharePoint, and send Rale a summary of outstanding points; requested updated outstanding list.
+
+1 Jul 2026 18:33 SAST - Updated from email 'BW Mascom – ASN Source Samples for Decoding': noted samples uploaded; next step is to decode samples and share decoded output for client validation prior to ETL build.
+24 Jun 2026 20:47 SAST - Updated from email 'BW Mascom Grammar files for ASN.1': clarified need for grammar files + encoded/decoded samples per ASN.1 source (excl TAP) and urged early vendor engagement.
+24 Jun 2026 08:10 SAST - Captured new request: complete missing feed specs + add raw/decoded/grammar files for ASN.1 feeds to tracker before weekly call so daily tracking can start.
+
+24 Jun 2026 08:10 SAST - Reviewed data feed samples/spec tracker: many feeds missing specifications; need raw, decoded, and grammar files for all ASN.1 encoded feeds. Add these to the tracker before today’s weekly call so daily tracking can start.
+
+21/5 see email from Rale with additional samples provided
+Wed, May 27
+see follow up to Rale and Onalenna
+Wed, Jun 3
+see follow up to Rale. Ali to check new samples
+Wed, Jun 10
+Escalatino sent to Ali
+See feedback from Ali and response back to him
+
+Moved older Update notes during cleanup:
+2026-07-03 12:22 SAST — Request: Please send a summary of outstanding samples and specs to Rale.
+
+2026-07-03 12:21 SAST — Update: Ali has started copying sample data to the shared folder (starting with ASN files) and shared links with the TV team to begin decoding; remaining sample folders are prepared and copying will continue.
+2026-07-03 09:10 SAST — Request: review all data source samples/specs, copy everything to the LATRO project SharePoint folder, and send Rale a summary of outstanding points; please share the updated outstanding list/points.
+
+1 Jul 2026 18:33 SAST - Ali uploaded sample ASN files for new Mascom sources and requested we decode the samples and share decoded output for client validation before proceeding with full ETL implementation.
+1/7 Ali asked TV to decode all ASN.1 from their side and we will validate with Mascom, no need for grammars now
+24 Jun 2026 20:47 SAST - Request Mascom/vendor teams to provide ASN.1 grammar files plus encoded & decoded samples for each new ASN.1 source (except TAP). Engage vendors early as this is critical for ETL development.
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+2026-07-22 09:02 SAST — PMO agent changed Owner from Ali to Aritra.
+
+Moved from Update on 2026-08-03:
+2026-07-03 16:15 SAST — Request: follow up on remaining sample data sources; confirm whether Site Information for 2G/3G/4G/5G is consolidated into one file and, if so, where the network technology field is captured (or whether it’s not required).
+
+2026-08-03 16:44 SAST — PMO cleanup: retained only the latest update in Update and moved all older entries to Update History.
+
+Moved from Update on 2026-08-11:
+2026-07-22 09:02 SAST — Owner changed from Ali to Aritra.
+
+2026-08-11 17:22 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+Active Directory integration,Fw: BW Mascom AD Integration,14,"August 12, 2026 9:04 AM",Kaone,High,BW Mascom,In progress,"2026-07-29 12:58 SAST — Urgent request to Mascom (Kaone) to provide the required AD integration details: service account, bind DN, users DN, group DN, security group, and add required users to the security group.","2026-07-29 12:58 SAST — Updated from email “Fw: BW Mascom AD Integration”: logged urgent request for AD integration details (service account, bind DN, users DN, group DN, security group + add users); raised Priority to High.
+
+2026-07-29 12:55 SAST — Updated from email “BW Mascom AD integration”: logged follow-up request for client status update; Mohamad Awab Alkhiami looped.
+
+06 Jul 2026 09:13 SAST - Sent reminder to Kaone for outstanding AD integration details.
+
+24 Jun 2026 08:14 SAST - Updated Email Subject + added latest follow-up request (awaiting Mascom response).
+
+Moved older Update notes during cleanup:
+Mon, Jun 8
+See email to Kaone with info required.
+See response from Kefiwle to Kaone, You need to log a request to create these service accounts if they do not exist already and specify the groups you will be using or request to create a new group as well.
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+Moved from Update on 2026-07-15:
+24 Jun 2026 08:14 SAST - Follow-up sent to Kaone requesting the AD integration details (service account, bind DN, users DN, group DN, security group + add required users). Awaiting Mascom response.
+
+2026-07-15 — PMO cleanup: moved the older dated update from Update to Update History and retained only the latest dated update in Update.
+
+Moved from Update on 2026-08-03:
+2026-07-29 12:55 SAST — Natalie followed up requesting an update on the AD integration with Mascom/client; Mohamad Awab Alkhiami has been looped in. Next step: provide status update / confirm when the required AD details will be shared.
+
+06 Jul 2026 09:13 SAST - Reminder sent to Kaone to provide the AD integration details (service account, bind DN, users DN, group DN, security group, and add required users). Awaiting Mascom response.
+
+2026-08-03 16:44 SAST — PMO cleanup: retained only the latest update in Update and moved all older entries to Update History."
+"Missing files: MOMO, USSD, GGSN","Fw: BW Mascom Online Eportal, USSD, User and System sources not received",16,"August 19, 2026 8:17 AM",Francois Du Toit,High,BW Mascom,In progress,[2026-08-12 12:21 SAST] Masa confirmed there are no updates yet; the missing files have still not been received.,"[2026-08-12 12:21 SAST] Updated from email: Mascom confirmed no update; files still not received; updated Email Subject.
+
+[2026-08-12 09:14 SAST] Updated from email follow-up: Francois asked Masa for an update on the outstanding missing files; updated Email Subject.
+
+Moved from Update on 2026-08-19:
+[2026-08-12 09:14 SAST] Francois followed up with Masa requesting an update on the outstanding missing source files (Online Eportal/USSD and related MoMo user/system sources).
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Data gathering sessions: 98%,IQ Asiacell Data gathering,20,"August 19, 2026 8:17 AM",Abdulrahman Ishtayeh <mailto:abdulrahmani@latro.com>,High,IQ Asiacell,In progress,"18/8
+Only ERP left  need reset of dump like AR, AP, invoices","2026-07-13 16:50 SAST — Updated action with latest data gathering progress (86%) and highlighted remaining data sources requiring samples/specs; updated email subject.
+
+2026-06-30 18:41 SAST — Added action from PMO call: Abdulrahman to add Digital channels to the data gathering progress tracker; stored email subject.
+
+2026-06-29 08:09 SAST — Logged request from Francois: add Digital services + CBS Tables to data gathering sheet; provide progress update and action owners for escalation.
+Mon, Jun 8
+See follow up from Rozh
+
+Moved older Update notes during cleanup:
+2026-06-29 08:09 SAST — Request to add Digital services and CBS Tables to the data gathering sheet and share updated progress + key action owners for escalation/urgent closure.
+Sun, Jun 7
+see update from Abdulrahman
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+Moved from Update on 2026-07-15:
+8/7
+Abdulrahman to set data gathering review call with Samir, Rozh, Nawar and Navin
+
+2026-06-30 18:41 SAST — Abdulrahman to add Digital channels to the data gathering progress tracker (per weekly PMO call notes).
+
+2026-07-15 — PMO cleanup: moved older dated updates from Update to Update History and retained only the latest dated update in Update.
+
+Moved from Update on 2026-08-19:
+2026-07-13 16:50 SAST — Data gathering progress shared: overall 86%. Pending items called out include SDP VAS (needs samples/spec), CBS Roaming (needs sample data + mapping fields), ERP (remaining dumps like AR/AP/invoices), Paymobile (spec/docs + samples), and agreeing ESB integration protocol.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+PIP Update,Fw: IQ Asiacell PIP Update,22,"August 19, 2026 8:17 AM",Rozh,High,IQ Asiacell,In progress,"11/8
+Version 1.97 shared","2026-07-30 13:48 — Received updated IQ Asiacell PIP: server delivery 17 Aug; ETL Phase 0 +20 working days for CBS tables; security scope updated (WAF/PAM/SIEM/VAPT); plan subject to 7.7B/day cap pending CDR volume confirmation.
+
+2026-07-27 16:07 — Logged request for Rozh to review PIP tasks 10–19 and align post-UAT security tasks (VAPT/PAM/WAF timelines).
+
+2026-07-14 16:54 SAST — Updated PIP milestones: infra ready/access by 15 Aug; check WAF learning included.
+
+Moved from Update during 2026-07-31 full audit:
+29/7
+Updated PIP shared
+2026-07-27 16:07 PIP — Need Rozh review/align tasks 10–19 + post-UAT task per security notes: VAPT after UAT (7 WD + include reassessment), PAM form/ticket timings (std 6 WD; custom 3–4 wks), WAF questionnaire + integration (8 WD); requirements already in security sheet.
+
+2026-07-14 16:54 SAST — Update PIP: infra ready with access by 15 Aug; confirm WAF learning is included.
+
+2026-07-31 17:51 SAST — Full PMO audit: retained only the most recent comment in Update.
+
+Moved from Update on 2026-08-19:
+30/7
+Updated PIP shared (as discussed today). Key updates: server delivery set for 17 Aug; ETL Phase 0 extended by 20 working days to accommodate CBS tables; security assessment/fixes updated to include WAF, PAM, SIEM and VAPT; plan subject to max total record count of 7.7B/day pending confirmation of total CDR volume.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+BRD Conclude,Fw: IQ Asiacell BRD finalize,23,"August 20, 2026 12:15 PM","Francois, AR, Badee, Navin",High,IQ Asiacell,In progress,"[2026-08-20 12:14] Francois noted the latest BRD includes substantive changes/additional requirements (beyond minor admin/signatories). LATRO to review internally (incl. re-rating points) and provide feedback once assessment is complete.
+
+[2026-08-18 17:26] Weekly PMO: add high-level rerating requirements to BRD (details in FSD) to avoid delaying BRD signoff; Navin to share minor BRD updates and provide feedback with Samir on BRD adjustments for rerating. CS team gave conditional approval for live data feeds in staging for 3 months (extendable); Rozh to share CS comments for PIP updates.",[2026-08-20 12:14] Logged email update: BRD has substantive new changes; LATRO to review and respond (incl. re-rating points).
+CRM Dump planning,,25,"June 23, 2026 8:07 AM",Abdulrahman,Medium,IQ Asiacell,In progress,"17 Jun
+Samples uploaded by Rozh, Abdulrahman to check
+","Tue, Jun 2
+Sample to be provided from current CRM dump (as provided to the BI Team)
+Mr. Dana will assist with drafting an email to the CRM dump owner(s) for sharing with LATRO.
+Tue, Jun 9
+See response to Rozh, file received, but spec not sample tables. Abdulrahman to verify. Dumps still to be provided and uploaded"
+Remote Access VPN,Fw: IQ Asiacell VPN jump server,27,"July 15, 2026 8:02 AM",Nawar,Medium,IQ Asiacell,In progress,"2026-07-09 11:27 SAST — Clarification sent: Jump Server access is needed now to test/validate VPN connectivity ahead of RAFM server deployment; RAFM servers not yet deployed (still under implementation), but remote access path must be operational when available.","2026-07-09 11:27 SAST — Appended latest clarification: Jump Server access required now to test/validate VPN connectivity before RAFM server deployment; updated Email Subject to forwarded thread subject.
+
+2026-07-09 08:33 SAST — Appended latest email request: confirm Jump Server VPN access for RAFM team (17 users) and captured server details + IP; updated Email Subject.
+
+2026-07-06 11:12 SAST — Noted latest email follow-up from Nawar: “Would you please check again” re VPN access request #SD29870965.
+
+2026-07-02 15:55 SAST — Updated VPN action: ticket #SD29870965 still pending approval (per Shwan Aziz follow-up).
+
+2026-07-01 18:46 SAST — Logged new RAFM team VPN access request; ServiceDesk request #SD29870965; updated email subject.
+
+2026-06-30 18:41 SAST — Added follow-up request: Dana to align with Kak Nawar on remote VPN account creation + PAM/PAM requirements; stored email subject.
+
+2026-06-22 18:11 SAST — Email update: remote access VPN setup requires Kak Nawar support; stored email subject.
+
+Tue, Jun 2
+Mr. Nawar will follow up on the remote VPN ticket and jump server setup.
+Wed, Jun 3
+Feedback from Nawar: Windows server. Francois shared list of people connecting.
+Sun, Jun 7
+See reminder to Rozh and team
+Tue, Jun 9
+see teams with Rozh: pending with the OS application meeting on Thursday and let us bring it up to Kak nawar as he is the technical owner.
+Nawar will remind teams
+Tue, Jun 16 15:15 — Logged request for GlobalProtect VPN account creation (Hadi Drwish, Hamza Alsaadi, Ghram Alhajy, Gergos Gergosg, Eman Tarabnin, Masa Serawan, Meheden Alkhatib) and add to VPN_Latro; DUO enablement links pending readiness.
+
+Moved older Update notes during cleanup:
+2026-07-01 18:46 SAST — Asiacell requested new VPN access for RAFM team members; ServiceDesk request #SD29870965 created.
+
+2026-06-30 18:41 SAST — Dana to follow up with Kak Nawar on remote VPN account creation + PAM requirements (per weekly PMO call notes).
+
+23 Jun
+VPN Users list re sent to Nawar
+2026-06-22 18:11 SAST — Remote access VPN setup: Kak Nawar Yaqoob to support (per latest action alignment).
+
+2026-06-16
+See email to Rozh.
+
+28/4 Nawar will check the ticket status, not urgent.
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+Moved from Update on 2026-07-15:
+2026-07-09 08:33 SAST — Asiacell requested confirmation to grant RAFM team (17 users) Jump Server access via VPN; jump server BIRFMJS01AIDFRV (Win Server 2019) / IP 10.21.190.50 (status OK).
+
+2026-07-06 11:12 SAST — Asiacell requested another check/follow-up; VPN access request #SD29870965 still pending approval.
+
+2026-07-02 15:55 SAST — Follow-up from Asiacell Cyber Security: VPN access request #SD29870965 is still pending approval.
+
+2026-07-15 — PMO cleanup: moved older dated updates from Update to Update History and retained only the latest dated update in Update."
+Data Feed Mapping to Business Requirements,IQ Asiacell data feed mapping,28,"July 27, 2026 8:12 AM",Navin,Medium,IQ Asiacell,In progress,"2026-07-27 08:11 SAST — Request to add the CDR names per each available data source (received from Asiacell) to help data source owners provide correct estimations.
+
+","2026-07-27 08:11 SAST — Logged request to add CDR names per data source for estimation support.
+"
+OS install and setup,,31,"June 22, 2026 11:03 AM",Rozh,Medium,IQ Asiacell,In progress,"15 Jun
+See feedback from Kurdo
+Partitioning shared. 
+1. FW access ,I checked and still the server IPs are not ready so we can request the access once IPs are ready .
+2. Proxy whitelisting, Same for proxy we will provide once IPs are ready.","Thu, Jun 11
+See actions from Rozh:
+
+Standard partition 
+FW access 
+Proxy whitelisting"
+ETL In progress,Fw: IQ Asiacell ETL implementation update,32,"August 18, 2026 8:19 AM",Meheden,High,IQ Asiacell,In progress,"2026-07-06 08:07 SAST — Francois follow-up requesting updated ETL implementation timelines (ETL for MSC, IMS, SMSC, USSD).","2026-07-06 08:07 SAST — Logged Francois follow-up request for updated ETL implementation timelines; updated Email Subject.
+
+02/07 07:54 — Updated action with request to confirm ETL timelines for 4 sources by Sun 5 July (per Francois email).
+Sun, Jun 7
+See reminder to Meheden to confirm IMS Grammar
+
+Moved older Update notes during cleanup:
+30/6
+see request to Meheden to update
+23 Jun
+FSD and IA provided by Abdulrahman
+Tue, Jun 2
+see email to Natalie and Meheden, Abdulrahman to share IA
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update."
+Server delivery Status,FW: IQ Asiacell Assure Rev Key project actions,33,"August 11, 2026 5:49 PM",Rozh,High,IQ Asiacell,In progress,"11/8
+Assume 1 October as handover to LATRO to start implementation.","2026-07-14 — Added assumed 1 August hardware delivery date and the associated IT readiness checks for Waleed’s review. Prior update retained.
+
+2026-06-22 — Server delivery remained pending CMC approval.
+
+2026-07-15 — PMO cleanup: moved the older dated update from Update to Update History and retained only the latest dated update in Update.
+
+Moved from Update on 2026-08-11:
+2026-07-14 — For IT Director confirmation: use 1 August 2026 as the current assumed hardware delivery date in the plan, while confirming whether CMC approval and release are secured. Validate installation readiness immediately after delivery, including rack/space, power, IP allocation, firewall rules, proxy whitelisting, OS build, and access dependencies.
+
+2026-08-11 17:21 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+"
+ATRA Escalation letter:
+
+Failure to conduct and complete the Training programs at the Intermediate and Advanced levels.  
+Provision of licenses and replacement of Cisco equipment.  
+Provision of support and licenses related to Dell equipment and servers.  
+Failure to complete the activities and requirements related to the Primary Site and Disaster Recovery (DR) Site",,37,"August 11, 2026 5:21 PM",Francois Du Toit <francoisd@latro.com>,Medium,AF RTDMS,In progress,2026-08-03 17:33 SAST — Status changed to Done at Francois’s request.,"2026-08-03 17:33 SAST — PMO agent changed Status from In progress to Done.
+
+Moved from Update on 2026-08-11:
+Wed, Jun 10
+Action today: Send email to Marjan
+
+2026-08-11 17:21 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+"
+System monitoring and Alerting setup:
+SOP
+Escalation matrix
+End to end monitoring and alerting",AF RTDMS Platform Monitoring and Alert management document,38,"August 19, 2026 8:17 AM",Aman Ehsan <amane@latro.com>,High,AF RTDMS,In progress,"2026-08-18 10:15 SAST — Francois asked how alerts will reach the NOC team (e.g., whether ManageEngine tickets are auto-generated) and whether monitoring for agent nodes at MNO sites can be implemented within ~2 weeks after all MNO routers are switched.","2026-08-18 10:15 SAST — Updated from email “AF RTDMS Platform Monitoring and Alert management document”: captured questions on NOC alert routing/ManageEngine auto-ticketing and 2-week monitoring implementation timeline for MNO agent nodes.
+
+28/5 see email to team
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+Moved from Update on 2026-08-11:
+29/5 see actions email to Aman and Abhijit
+
+2026-08-11 17:21 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History
+
+Moved from Update on 2026-08-19:
+14/7
+See email to Aman and Abhijit
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+"
+Dell System backup license:
+1. Replace NVRAM. (In Kabul Custom)
+2. Dell to do health check warranty support pre requisites) 
+3. Update warranty - contingent on item one and two above. 
+4. Get pricing for DD6800 PowerProtect Data Manager Subscription (30) Sockets and R670 Backup server from Hazrat and compare to pricing received from Mughees at Mindware.",AF RTDMS Fw: URGENT RE: Data Domain DD6800 Capacity License Required to Proceed,41,"August 12, 2026 7:24 AM",Hazrat,High,AF RTDMS,In progress,"2026-08-12 07:24 SAST - Hazrat reports Dell TSE contacted mailto:najebi@atra.gov.af and mailto:amane@latroservices.com for the DD6800 capacity license re-certification, but no response yet; action is to urgently reach out to both and have them respond to Dell so licensing can proceed.","2026-08-12 07:24 SAST - Email update: Hazrat says Dell TSE contacted mailto:najebi@atra.gov.af and mailto:amane@latroservices.com for DD6800 capacity license recertification; both have not responded. Next step: reach out and get them to respond to Dell ASAP.
+
+2026-07-28 18:25 SAST - Email update: Francois sent updated recertification form to Hazrat to proceed with Dell recertification/capacity license activity.
+
+2026-07-22 10:35 SAST - Email update: Hazrat confirms quote request sent to Dell; waiting on Dell scan/warranty pricing to obtain/apply DD6800 capacity license and proceed.
+
+2026-07-20 11:03 SAST - Updated action: noted NVRAM replaced and system healthy; blocker now capacity license required (43.66 TiB per pack) and Dell licensing support needed to proceed.
+
+Mon, Jun 8
+see email to Hazrat
+see email from Aman, we will first replace the NVRAM, was received in US Office and Fahim will get it shipped to Kabul (16/6 see emails between Aman and Mughees from mindware on parallel pricing).
+17/06/2026 11:13 SAST - Logged new email update: Mindware requests BoQ review/confirmation from Aman to proceed with pricing (subject: AF RTDMS Dell system backup license RE: Quotation).
+
+15/2 see email to Fountain and Aman to get pricing and confirm if not in BOQ.
+23/2 reminder sent
+4/3 see feedback from Aman to Fountain
+17/3 see email from Hameed to Fountain
+10/5 see email to Fountain
+19/5 see email from Rahim to Hazrat:
+We have identified a critical alert related to the NVRAM module (Slot 0). We will first verify whether the module is faulty and update you accordingly.
+Please proceed with the initial coordination for recertification
+27/5 see emial to Rahim to provide status update and pricing
+31/5 see email to Hazrat and Fountain. See email from Rahim to Hazrat that system is reporting critical alerts related to the NVRAM module, asking dell support for health check and replacement
+16/6 13:12 SAST - Added request: Hazrat WA to load remaining 4 licenses (email subject: Af rtdms sssnt).
+
+Moved older Update notes during cleanup:
+30/6
+Aman confirmed we need the server and backup license, see follow up to AMan
+28/6
+Pricing provided but need to confirm 300TB storage, see response to Mughees
+23 Jun
+See email from Mughees
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+Moved from Update on 2026-08-03:
+2026-07-22 10:35 SAST - Hazrat shared with Dell to get the quote; request outstanding for Dell to proceed with scan/warranty pricing to enable capacity license and proceed with filesystem creation.
+
+21/7
+see email to Hazrat for dell to scan
+
+2026-07-20 11:03 SAST - Hardware/NVRAM fault resolved (NVRAM replaced); DD6800 healthy and shelves detected. Current blocker is missing capacity license (""License Needed: 43.66 TiB"" per storage pack) — need Dell licensing support to obtain/apply capacity license so filesystem can be created and backup config can proceed.
+
+13/7
+See email to Aman, NVRAM cleared and installed? Dell test?
+2/7
+see email to Aman
+
+2026-08-03 17:14 SAST — PMO cleanup: retained only the latest update in Update and moved all older entries to Update History."
+User guide and manual update for MS4,,45,"August 11, 2026 5:21 PM","
+Sanjay",Medium,AF RTDMS,In progress,2026-08-03 17:33 SAST — Status changed to Done at Francois’s request.,"2026-08-03 17:33 SAST — PMO agent changed Status from In progress to Done.
+
+Moved from Update on 2026-08-11:
+16/4 see email to Sanjay
+
+2026-08-11 17:21 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+Solarwinds version upgrade and license renew. Check other software,AF RTDMS solarwinds,47,"August 3, 2026 5:14 PM",Rahimullah Hashimi,High,AF RTDMS,In progress,2026-07-26 06:26 SAST — Migration to temporary Windows Server 2022 VM completed; NPM 2024.2.1 installed; Orion DB restored to SQL Server 2022; admin login works but Orion Summary View throws error “RunQuery failed… Cannot resolve property IsSubscription”. Request SolarWinds support session/assistance.,"2026-07-26 06:26 SAST — Updated from email: temporary server migration done; post-login Orion Summary View error “Cannot resolve property IsSubscription”; requesting SolarWinds support session.
+2026-07-22 10:36 SAST — Updated from email: arranging temporary server for SolarWinds install/migration; will update progress.
+
+Moved from Update on 2026-08-03:
+2026-07-22 10:36 SAST — Rahimullah confirmed they are arranging a temporary server for SolarWinds installation/migration; steps are clear and they will update progress / reach out if support is needed.
+
+2026-08-03 17:14 SAST — PMO cleanup: retained only the latest update in Update and moved the older entry to Update History."
+"
+Validate T.1.3 network test report",,50,"August 10, 2026 4:57 PM",Aman,High,AF RTDMS,In progress,31/5 reminder sent to Aman,"12/5 request shared
+18/5 reminder sent to Aman
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update."
+Dell Blade server replacement MX760c: Use Dell Email received by Francois and Dell letter,,54,"August 11, 2026 5:20 PM",Marjan,High,AF RTDMS,In progress,"10/8
+Aman to get Dell quote","2026-07-14 — Added Dell US EOS confirmation for MX760c/full MX range and retained action to conclude the replacement approach.
+
+Moved from Update on 2026-08-11:
+2026-07-14 — Weekly PMO update: Dell US advised by email that the MX760c and the entire MX range reached end of sale on 30 June 2026. Action remains to conclude the replacement approach with Dell.
+
+2026-08-11 17:21 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+Urgent: Dell delivery dates,,55,"June 14, 2026 5:16 PM",Hazrat,Medium,AF RTDMS,In progress,"
+Sun, Jun 7
+See email to Hazrat",
+Final Acceptance consultants SOW (FAC),,56,"July 4, 2026 8:03 AM",Aimal Marjan <aimalm@latro.com>,Medium,AF RTDMS,In progress,"22 Jun
+Reminder sent to Marjan on WA","Sun, Jun 7
+See SOW sent to Marjan, what did Safi say?
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update."
+MNO TSF reports vs RTDMS misalignment: AWCC April and May,,58,"August 11, 2026 5:20 PM",Sanjay Verma <sanjayv@latro.com>,Medium,AF RTDMS,In progress,"11 Aug
+See email from Sanjay to Najebi","Moved from Update on 2026-08-11:
+Mon, Jun 8
+See email from Sanjay: All revenues should be aligned in couple of days, except AWCC 2nd half April, which would take a bit longer as it need complete 2 weeks reprocessing. This is all considering we dont face network issue which result in file corruption during ftp.
+
+2026-08-11 17:20 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+Zippylink next payment due for Dell and Cisco orders,,60,"August 10, 2026 4:56 PM",Hazrat,High,AF RTDMS,In progress,"20/7
+See email to Hazrat","Wed, Jun 10
+SEe email to Hazrat
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+Moved from Update during 2026-07-31 full audit:
+18 Jun
+See email, pay mid July
+
+2026-07-31 17:47 SAST — Full PMO audit: retained only the most recent comment in Update."
+Dell Warranty and next day support,Re: AF RTDMS Dell Warranty and SADMG,61,"August 19, 2026 8:16 AM",Rahimullah H,Medium,AF RTDMS,In progress,2026-08-16 07:41 SAST — Francois follow-up: please revert ASAP on confirming the BOQ accurately reflects all existing Dell equipment for warranty/support coverage.,"2026-08-16 07:41 SAST — Follow-up received from Francois requesting urgent response/confirmation on the Dell BOQ for warranty/support coverage.
+
+2026-08-11 18:21 SAST — Logged request to confirm BOQ vs existing Dell equipment; action pending confirmation.
+
+Moved from Update on 2026-08-19:
+2026-08-11 18:21 SAST — Request Rahimullah H to confirm BOQ accurately reflects all existing Dell equipment for warranty/support coverage.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Application and system monitoring ownership: TV,"FW: Urgent: RE: Asiacell RAFM TDT V2.0 ",91,"June 18, 2026 8:14 AM","Aman, Ihab, Allison",Medium,IQ Asiacell,In progress,"18 June
+see email to Aman, Ihab and Allison: Hi mailto:allisonc@latro.com, can you please share the TV PSA draft so we can add the relevant content?
+ 
+Hi mailto:ihabs@latro.com, I will be drafting an email to Moamen summarizing their ownership and responsibility to ensure all our operational monitoring requirements are met via the Assure Rev alerting tools. Are you aligned with this decision?",
+"System monitoring, alerting and SLA adherence dependency on SMTP (due to S2S not allowed)",RE: IQ Asiacell TDT: O&M Connection requirement,92,"June 23, 2026 6:23 PM",,Medium,IQ Asiacell,In progress,"18 June
+see statment sent to Rozh and team",
+"CR: Data feed Extra column(s) in CBS CDRs: MON: Rental CDR. 
+This is a source/adaptor impact assessment. LATRO cannot confirm KPI or IFRS impact until Lebara provides actual sample CDRs which is expected in July.",Fw: High Priority: SA Lebara RE: Update Data CDR,97,"August 11, 2026 5:19 PM",Raja,High,SA Lebara,In progress,2026-08-04 13:16 SAST — Lebara (Tawheed Shah) expects the change to be deployed on the test bed by end of this month; sample CDR will be shared after deployment.,"2026-08-04 13:16 SAST — Updated per email: target test-bed deployment end of month; sample CDR to follow. Set Priority=High; updated Email Subject.
+2026-07-20 07:46 SAST — Updated status: Lebara still working on IOT version; sample CDR pending from R&D; SR to be opened/assigned to Tawheed.
+
+Moved from Update on 2026-08-11:
+2026-07-20 07:46 SAST — Awaiting sample MON CDR (IOT version still being worked on by HQ/R&D). Lebara to open SR and assign to Tawheed Shah for support.
+
+2026-08-11 17:20 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+2026 PO,RE: SA Lebara: RAFM CR Purchase Orders and Annex 5,98,"July 4, 2026 7:54 AM",Francois,Medium,SA Lebara,In progress,"30/6
+See teams from Suleman, keep using original PO","28 Jun 2026 17:43 (SAST) — Updated action with follow-up request to issue 2026 & AMS POs; saved email subject for traceability.
+
+28 Jun
+Followed up with Abdulrahman: confirmed signed Annex 5 received; asked if PO for 2026 Managed Services and AMS has been issued.
+
+24 Jun
+see reminder to Abdulrahman. See teams from Suleman: also there is an issue internally on PO, the old PO is still open in system
+11/6 Syed issue PR for AMS then Abdulrahman will create a new PO (AMS has different period than the 2026 Managed Services). Asked Abdulrahan to share PO
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update."
+RAFM.VersaBlockerMS@lebara.sa recipients,,99,"June 19, 2026 1:41 PM",Syed,Medium,SA Lebara,In progress,9/3 see email to Syed,
+Lebara HDFS Node 1 HDD replacement and Eid support,,101,"June 19, 2026 1:41 PM",Aman,Medium,SA Lebara,In progress,"20/3 see email from Aman:
+Still working on it , not sure if we will be able to get Vinod’s support on this critical disk swap unless we offload the data to space disk . I will be working on it and keep you updated.",
+PCRF: Manage Zipped files being received,,102,"July 4, 2026 7:54 AM",Abhijit,Medium,SA Lebara,In progress,23/4 see issues shared by Muhaiad to Sneha,"16/3 see email to Abhijit. Previous discussion:
+Abhijit needs to do coding to process the 5 ZIP files and drop different PCRF files into correct folders, will require thorough testing.
+Will revert later this week
+23/3 WA sent to Abhijit
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update."
+MSR and QBR Planning,,103,"July 4, 2026 7:54 AM",Sindi,Medium,SA Lebara,In progress,7/5 see draft report shared with Suleman and request for meeting with CFO in week 17 before Eid,"7/5 see draft report shared with Suleman and request for meeting with CFO in week 17 before Eid
+
+15/3 see email from Suleman to Badee and Sindi
+Dear Badee
+Thank for the email. I believe we can do this session after Eid Vacations and cover both months.
+Dear Sindi
+We have collected feedback regarding enhancements on MSR and other reporting and monitoring layer requirements pertaining to business cases, KPI triggers, Mediation KPI and MS Observation deck.
+Kindly club all those points and circulate here in this email, it will support all stakeholders.
+
+
+2026-07-04: PMO cleanup moved the older Update note into Update History and kept the latest known comment in Update."
+Annual KPI report,,104,"June 19, 2026 1:41 PM",Raja,Medium,SA Lebara,In progress,7/5 see teams from Raja. Complete after MSR,
+PR and PO for AMS,,105,"June 19, 2026 1:41 PM","Syed, Abdulrahman Aldwallah",Medium,SA Lebara,In progress,17/6 see reminder to Syed,
+Site survey for rack moving at Malqa2,,106,"July 31, 2026 5:44 PM","Aman, Vinod",Medium,SA Lebara,In progress,"[2026-07-21 07:56 SAST] Follow-up request: Syed to confirm whether rack relocation will proceed (current → new location), including availability of required fiber and power cabling; plan previously not confirmed per Vinod discussion.","[2026-07-21 07:56 SAST] Logged email follow-up asking Syed to confirm rack relocation decision and confirm fiber/power cabling availability.
+17/6 see email sent
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update.
+
+Moved from Update during 2026-07-31 full audit:
+22 Jun
+see update request sent to Syed
+See response from Aman: Rack location to be confirmed. Need fiber and power cables
+
+2026-07-31 17:44 SAST — Full PMO audit: retained only the most recent comment in Update."
+2027 contract renewal strategy and gap analysis,Fw: SA Lebara: Gap Analysis request,107,"July 5, 2026 7:03 PM",Badee,High,SA Lebara,In progress,"2026-07-05 19:03 SAST — Per Badee: Lebara prefers to run a comprehensive workshop during the upcoming RFP process, so no additional business-side effort is needed now; Suleman will be on leave for one month starting next week.",2026-07-05 19:03 SAST — Updated based on email “Fw: SA Lebara: Gap Analysis request”: align to run comprehensive workshop during RFP; no further business-side effort now; note Suleman on 1-month leave.
+CBS Testbed: PO,,108,"June 19, 2026 1:41 PM",Syed,Medium,SA Lebara,In progress,"6/8/2026
+Syed accepted proposal, to prepare PR (RP)",
+"Lebara  HDD replacement and 5th HDFS Node 
+1. Lebara to pay: by 9/7 as per Syed.
+2. LATRO procure replacement HDDs.
+3. Francois and Aman provide the implementation timeline to Mr. Suleman and Mr. Syed.
+4. Aman plan HDD replacement and 5th HDFS Node installation.",Fw: SA Lebara: HDD replacement and 5th HDFS Node,110,"August 19, 2026 8:16 AM","Francois, Syed",Medium,SA Lebara,In progress,"17/8
+See email to Syed and Technology
+Aman to travel on 13 September","[2026-07-30 07:37 SAST] Captured shipping/customs next steps: Aman received tracking package details; proceed with DDP shipment (FedEx), get quote + shipment dimensions/weight; inform Suleman LATRO will handle customs/duties/taxes and request Lebara business license/registration certificate.
+[2026-07-27 19:42 SAST] Captured updated HDD procurement guidance: local quote increased; recommended purchasing drives from U.S. + shipping DDP; Gamma confirmed no charge for 5th node integration.
+[2026-07-21 18:40 SAST] Email update captured: rack will not be moved for now; planning disk swap; timeline to be shared once confirmed.
+[2026-07-21 07:57 SAST] Captured updated SA Lebara storage risk mitigation schedule and added request to confirm rack relocation + fiber/power cabling availability.
+
+Moved from Update during 2026-07-31 cleanup:
+[2026-07-27 19:42 SAST] Latest update: Aman received an updated local Saudi vendor quote with increased pricing. Recommendation is to purchase the required drives from the U.S. and ship to Saudi Arabia on DDP terms (Aman also shared a U.S. vendor with 35 drives in stock). Note: Gamma confirmed they will not charge for the 5th node integration.
+
+[2026-07-21 18:40 SAST] Latest update: Syed confirmed they will not move the rack for now (plan migration assuming no movement). Aman is planning the disk swap and will share a confirmed timeline once available.
+
+[2026-07-21 07:57 SAST] Updated implementation plan shared: HDD procurement & delivery 21-Jul-26 to 18-Aug-26; upgrade 21-Aug-26 to 8-Sep-26; rack relocation planned 19–20 Aug; HDD swap 21–28 Aug; 5th node config 21–24 Aug; deployment 25 Aug–8 Sep. Latest request: please confirm whether rack will be moved to new location and that required fiber and power cabling will be available.
+
+2026-07-31 17:40 SAST — PMO cleanup: retained only the latest operational update in Update.
+
+Moved from Update on 2026-08-19:
+[2026-07-30 07:37 SAST] Latest update: Aman confirmed receipt of package details from the tracking Allison provided. Next steps: proceed with DDP shipping to KSA (FedEx preferred) and obtain shipping quote; vendor to provide approximate weight/dimensions; inform Suleman that LATRO will handle customs clearance/duties/taxes, and request a copy of Lebara business license/registration certificate for import clearance.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Account management call,,115,"June 22, 2026 9:45 AM",Ashraf,High,SA RBM,In progress,"22 Jun
+See email from Ghofrane",
+"Phase 2 data samples and specs
+",,116,"June 22, 2026 9:44 AM",Mostafa,Medium,SA RBM,In progress,"26 Mch
+See email to Mostafa",
+Issue PO,,117,"June 22, 2026 9:44 AM",Ashraf,Medium,SA RBM,In progress,"26 Mch
+Reminder sent to Ashraf",
+FM process,,118,"June 22, 2026 9:46 AM",Marwan,Medium,SA RBM,In progress,"11/5 meeting held with Bader, actions below
+• Bader will share TCC voice bypass rule (DONE) and Marwan will configure the script(s).
+• Francois to set a follow up call when the TCC voice bypass rule(s) is active.
+• Marwan to share daily fraud alerts with Bader and Waed.",
+Get Dell confirmation re MX760c export/purchase route (US → Afghanistan),AF RTDMS Dell compliance and shipping to Afghanistan,121,"August 3, 2026 5:13 PM",Aman Ehsan (Dell contact),Medium,AF RTDMS,In progress,"3/8
+See email to Naveed","2026-07-12 07:21 SAST — Appended update: Dell added Naveed Siraj; escalation for formal written compliance position (support/deny/info-needed) on MX840c/MX760c US→Afghanistan shipment for ATRA.
+
+2026-06-22 18:01 SAST — Created action from email: request Dell confirmation on MX760c US purchase/shipping to Afghanistan for ATRA acceptance.
+
+10/7
+follow up sent to Dell Export compliance
+
+7/7
+see response to Dell
+
+2026-06-22 18:01 SAST — ATRA is requesting written confirmation from Dell that the MX760c blade server cannot be purchased in the US and shipped to Afghanistan by LATRO. Need Dell (not distributor) verdict via email; Aman to request/obtain confirmation.
+
+2026-07-15 — PMO cleanup: moved older dated updates from Update to Update History and retained only the latest dated update in Update.
+
+Moved from Update on 2026-08-03:
+2026-07-12 07:21 SAST — Dell Export Compliance added Naveed Siraj for visibility/advice. Francois escalated requesting a formal written response confirming whether Dell can support procurement/export of MX840c/MX760c from the US to Afghanistan for ATRA (or specific reason/info needed).
+
+2026-08-03 17:09 SAST — PMO cleanup: retained only the latest update in Update and moved all older entries to Update History."
+Urgent TOR 5: AF RTDMS Integration and Connectivity Process V1.0 document to be updated as per request from Abdulbasit,,125,"August 10, 2026 4:58 PM",Marjan,Medium,AF RTDMS,In progress,"10 July
+See updated document shared with team","23 Jun
+see email to Marjan
+
+2026-07-15 — PMO cleanup: moved the older dated update from Update to Update History and retained only the latest dated update in Update."
+S2S VPN ask for Cyber call,,127,"July 4, 2026 8:01 AM",Francois,High,IQ Asiacell,In progress,"1/7 
+teams discussion with Samir, Will set call with Cyber","24 Jun
+Samir will check with Cyber and arrange a meeting, see teams chat with him
+23 Jun
+Francois to ask Samir and Rozh
+
+2026-07-04: PMO cleanup moved older Update notes into Update History and kept only the latest comment in Update."
+"CR IFRS: change in the revenue recognition methodology for bundles with validity of more than one month. 
+Gamma quote, quote LATRO",Re: Urgent: SA Lebara IFRS financial report variation,128,"August 19, 2026 8:15 AM",Muhaiad,High,SA Lebara,In progress,"[2026-08-17 16:11 SAST] Call with Suleman: continue IFRS reporting (do not message that reporting pauses pending CR); propose limited, auditable interim calculation for 60/90-day Flex bundles (exclude triggers/zero-rate, extract MON subs CDRs, day-based revenue calc with audit trail, add back to IFRS report) while Daniel updates IFRS calc + validates DIM tables and alignment calls are scheduled.","[2026-08-17 16:11 SAST] Email update: captured Suleman call feedback — keep IFRS reporting running; pursue small nominal CR/interim auditable day-based calc for long-validity Flex bundles; Daniel to update IFRS calc and validate DIM tables; schedule alignment calls.
+
+[2026-07-31 17:13 SAST] Email update: confirmed the IFRS logic changes must be managed via CR; in parallel, feasibility of manual reporting workaround is being assessed.
+[2026-07-27 19:34 SAST] Email update: Daniel’s analysis confirmed multiple IFRS logic updates needed; CR process to be followed; proposal being finalized to share with Lebara.
+[2026-07-24 07:04 SAST] Email update: requested breakdown of man-days/profiles per task + discount request.
+[2026-07-22 18:37 SAST] Updated action: logged that we are awaiting Satish’s feedback on task breakdown and discount; updated Email Subject.
+[2026-07-19 06:12 SAST] Updated action: recorded receipt of Gamma proposal and request to prepare proposal for Lebara; updated Email Subject.
+[2026-07-16 07:13 SAST] Updated action: requested Gamma provide a summary of work required for IFRS change to motivate the CR; updated Email Subject.
+[2026-07-15 19:07 SAST] Logged request for Gamma feedback on IFRS changes impact + CR requirement (post Sana/Suleman sessions).
+
+Moved from Update during 2026-07-31 cleanup:
+29/7
+No Budget, discuss scripts and MS support with Daniel, Call set
+[2026-07-27 19:34 SAST] Daniel’s analysis indicates multiple updates needed to existing IFRS logic; CR process required. Proposal is being finalized to share with Lebara.
+
+[2026-07-24 07:04 SAST] Ghofrane requested Gamma provide a breakdown of man-days and profiles per task, and asked for a discount so this can be progressed.
+
+[2026-07-22 18:37 SAST] Waiting for Satish’s feedback tomorrow on the implementation task breakdown and discount (per IFRS CR discussion).
+
+[2026-07-19 06:12 SAST] Francois shared Gamma proposal for recent IFRS changes and requested preparing a proposal for Lebara.
+
+17/7
+See email to Suleman.
+Gamma to quote
+
+[2026-07-16 07:13 SAST] Francois requested a summary of work required to implement the IFRS change as motivation for the CR (to support CR submission).
+
+[2026-07-15 19:07 SAST] Requested Gamma (Daniel) feedback on IFRS changes impact and whether a CR is required (post sessions with Sana/Suleman).
+
+2026-07-31 17:39 SAST — PMO cleanup: retained only the latest operational update in Update.
+
+Moved from Update on 2026-08-19:
+[2026-07-31 17:13 SAST] Confirmed IFRS logic changes should be handled via a CR due to scope/impact; team also assessing a short-term manual reporting alternative (with validation/accuracy risks) and will revert once feasibility assessment is complete.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Control Implementation,BW Mascom control progress,136,"August 11, 2026 5:19 PM",Aritra,High,BW Mascom,In progress,"5/8
+Aritra and Hadi is discussing a solution. Once we complete a solution will share for review.","2026-07-23 09:13 SAST — Appended email “BW Mascom control progress”: country code list dedupe/consolidation question; SMS Source ETL modification; review requested for R118.C04.A03 script + sample output.
+
+Moved from Update during 2026-07-31 cleanup:
+[2026-07-14 16:29 SAST] Ali shared an updated version of the shared/trending controls and requested the output report be shared for client confirmation (expect iterations) before proceeding with dashboard implementation.
+
+2026-07-22 09:02 SAST — Owner changed from Ali Abdelrhim to Aritra.
+
+2026-07-31 17:39 SAST — PMO cleanup: retained only the latest operational update in Update.
+
+Moved from Update on 2026-08-11:
+[2026-07-23 09:13 SAST] Controls progress update: need confirmation whether Country_Code_list should keep multiple records per country code (by operator/area code) vs consolidate at country level; ETL for SMS Source control (R118.C04.A02) is being modified; script + sample output for (R118.C04.A03) provided for review.
+
+2026-08-11 17:20 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+URGENT HDD replacement and 5th HDFS node Gamma costing,Fw: SA Lebara: HDD replacement and 5th HDFS Node,145,"August 19, 2026 8:15 AM",Shiju Thomas,High,SA Lebara,In progress,"2026-08-18 07:48 SAST — Aman plans to replace the failed disk and install the 5th node during the second week of September. In the meantime, Aman is coordinating approvals for server installation, temporary Internet access for the 5th node, and the disk replacement.","2026-08-18 07:48 SAST — Updated per email: plan to replace failed disk + install 5th node in 2nd week of Sep; approvals in progress for server install, temporary internet, and disk replacement.
+2026-08-16 13:17 SAST — Updated per email: HDDs expected to be delivered to Lebara today; Francois requested Aman to share next steps.
+2026-08-11 08:54 SAST — Updated per email: Lebara requested device name/code and manufacturing certificates; set Owner=Shiju Thomas; updated Email Subject.
+2026-08-11 08:08 SAST — Updated with shipment dispatch details (pickup scheduled, tracking 8755 4655 9300, ETA 16 Aug 2026).
+2026-08-09 12:08 SAST — Updated action with receiving contact details for HDD shipment (Abdulrahman Alhumud, phone/email provided).
+2026-08-08 06:49 SAST — Prepended update: escalated to Abdulrahman for urgent assistance to dispatch HDD shipment.
+2026-08-06 14:00 SAST — Appended update: Lebara requested Abdulrahman’s support to provide receiving contact for the HDD shipment.
+2026-08-04 12:22 SAST — Updated action with request for receiving contact details for HDD shipment support (FedEx documentation + license upload).
+
+Moved from Update on 2026-08-11:
+2026-08-11 08:08 SAST — LATRO logistics scheduled pickup of the HDDs; shipping documents shared. FedEx tracking: 8755 4655 9300; estimated delivery 16 Aug 2026.
+2026-08-09 12:08 SAST — Lebara shared receiving contact details for the HDD shipment (Abdulrahman Alhumud, Logistics Manager). Phone: +966 578 288 808 / +966 576 981 408. Email: mailto:Abdulrahman.Alhumud@lebara.sa.
+2026-08-09 06:49 SAST — Francois escalated to Abdulrahman Alhumud for urgent assistance to dispatch the HDD shipment to reduce operational risk.
+2026-08-06 14:00 SAST — Lebara replied asking Abdulrahman Alhumud to support by providing the receiving contact for the HDD shipment (for FedEx documentation).
+2026-08-04 12:22 SAST — Request to Lebara (Hussain) to provide a Lebara contact person to receive HDD consignment being shipped via FedEx; Lebara will need to upload their business license in the FedEx portal for customs clearance.
+
+2026-08-11 17:19 SAST — PMO cleanup: retained only the latest comment in Update and moved older comments to Update History.
+2026-08-11 17:19 SAST — PMO cleanup: retained only the latest comment in Update and moved older comments to Update History.
+
+Moved from Update on 2026-08-19:
+2026-08-16 13:17 SAST — Francois received notification the HDDs will be delivered at Lebara today and requested Aman to share the next steps.
+
+2026-08-11 08:54 SAST — Lebara requested device name, device code, and manufacturing certificates for the shipment; Shiju to provide the requested information.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comments to Update History."
+Six Degrees PSA renewal / extension (SA Lebara),SA Lebara Six Degrees PSA,147,"July 2, 2026 10:01 AM",Francois,Medium,SA Lebara,In progress,2026-07-02 10:00 SAST — Confirm whether Six Degrees scope/pricing/SLAs remain the same and provide/locate any 2023–2026 6D/Lebara agreements so Legal can draft an updated PSA/period of performance (04 Aug 2026–03 Aug 2027).,2026-07-02 10:00 SAST — Created action from email “SA Lebara Six Degrees PSA”: need confirmation of same terms + find any 2023–2026 agreement; support Legal drafting updated PSA/PoP.
+MS4 Risk: TOR 25 30% Storage: 14 x 15 TB Waterpanter and 18 x Stackwise kits: Waterpanther alterntive to be found. 83 TB of SSD storage for both the DR and PR nodes.,AF RTDMS PR site SSDs,149,"August 11, 2026 5:19 PM",Allie,Medium,AF RTDMS,In progress,"11/8
+Allie to buy 2 of the reduced cost drives for testing, then the rest","2026-08-07 07:28 SAST — Added request for 28x 7.68TB Unity 400 SSDs; recommended 2-drive compatibility test in Kabul before bulk purchase.
+
+Moved from Update on 2026-08-11:
+2026-08-07 07:28 SAST — Request to procure 28x Dell EMC Unity 400 compatible 7.68TB 2.5"" 12Gb SAS SSDs (EMC firmware/carrier) to replace low-performing HDDs; buy 2 units first for Kabul compatibility testing, then purchase remaining 26.
+
+2026-08-11 17:19 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History."
+RTDMS Monitoring and Alerting,Re: AF RTDMS HDFS Storage headroom,154,"August 18, 2026 10:17 AM",Aman,High,AF RTDMS,In progress,"5/7
+See email to Aman and Abhijit",
+ATRA Ligowave Letter Respond,,156,"July 6, 2026 5:29 PM",Francois,Medium,AF RTDMS,In progress,"6/7
+Letter received. To prepare reply",
+Review & complete IQ Asiacell security questions (Vendor Comments),IQ Asiacell SBD,159,"July 31, 2026 5:38 PM",Ameer Abdulsamad,High,IQ Asiacell,In progress,2026-07-26 12:40 SAST — Asiacell confirmed PAM/WAF (and other remaining requirements) details will be provided once servers are ready and accessible; timeline to be updated accordingly.,"2026-07-26 12:40 SAST — Updated with Asiacell note: PAM/WAF details pending server readiness; plan/timeline to be updated; updated Email Subject.
+
+2026-07-22 19:19 SAST — Added new Asiacell reminder requesting urgent feedback/pending points on the Security Compliance Sheet; updated Email Subject.
+
+2026-07-22 10:02 SAST — Updated status: Security Compliance Sheet uploaded to SBD portal; updated Email Subject.
+2026-07-20 13:45 SAST — Updated action with new urgent Asiacell request for feedback / pending points on Security Compliance Sheet; updated Email Subject.
+2026-07-14 16:54 SAST — Noted expected security compliance feedback by end of week (Ameer).
+
+Moved from Update:
+2026-07-22 19:19 SAST — Asiacell sent a reminder requesting urgent feedback / confirmation of any pending points on the Security Compliance Sheet (Technical Owner + Compliance fields still to be completed).
+
+2026-07-22 10:02 SAST — Asiacell confirmed the Security Compliance Sheet has been uploaded to the SBD portal; no further action requested at this time.
+
+2026-07-20 13:45 SAST — Asiacell requested urgent feedback / confirmation of any pending points on the Security Compliance Sheet; LATRO to review and respond.
+
+16/7
+form shared by Ameer
+2026-07-14 16:54 SAST — Ameer to provide feedback on security compliance by end of week.
+
+2026-07-31 17:37 SAST — PMO cleanup: retained only the latest operational update in Update."
+VB Admin access for Mustafa and Muhaid,SA Lebara request for VB Superuser access,160,"July 31, 2026 5:38 PM",Raja M Akmal,,SA Lebara,In progress,2026-07-16 09:12 SAST — Lebara NOC acknowledged the VB access request and advised they are following up internally; awaiting their update (standby).,"2026-07-16 09:12 SAST — Email update: Lebara NOC said they are following up internally; asked to standby.
+2026-07-13 17:14 SAST — Updated next step: Raja to log Lebara ITSM ticket for Mustafa VB admin access; Suleman to approve.
+2026-07-12 07:45 SAST — Updated action: awaiting confirmation of who should receive VB admin access; next step is ITSM ticket by Raja with Suleman as approver.
+
+Moved from Update:
+2026-07-13 17:14 SAST — Francois confirmed next step: Raja to log a ticket on Lebara ITSM to request approval to add admin-level access to Mohamed Mustafa’s VB account; set Suleman as approver.
+
+2026-07-12 07:45 SAST — Francois asked Muhaiad & Mustafa to confirm who should have VB admin access; once confirmed, Raja to log Lebara ITSM ticket for admin access and set Suleman as approver.
+
+8/7
+See email to Suleman
+
+2026-07-31 17:37 SAST — PMO cleanup: retained only the latest operational update in Update."
+HDD rolling replacement schedule prepare,Re: AF RTDMS: Progress blockers,161,"August 10, 2026 4:59 PM",Aman,Medium,AF RTDMS,In progress,"8/7 
+see email to Aman",
+Clarify security justification/details for RAFM VPN access to Jump Server,IQ Asiacell VPN,163,"July 13, 2026 5:02 PM",Nawar / Shwan Aziz,High,IQ Asiacell,In progress,"2026-07-13 17:02 SAST — Asiacell (Rozh) noted jump server access/VPN testing is dependent on obtaining implementation clearance via the ongoing Security by Design (SBD) process; awaiting SBD clearance/approval before proceeding.
+
+","2026-07-13 17:02 SAST — Logged update that VPN/jump server access is dependent on SBD clearance per Rozh; action remains in progress.
+"
+Confirm dashboard description requirements and whether it’s included in the FSD (Control Template Workshop – Trending Controls),BW Mascom Fw: Control Template Workshop – Trending Controls,164,"July 9, 2026 4:27 PM",Badee Awwad,Medium,BW Mascom,Not started,2026-07-09 16:26 (SAST): Francois asked Badee to confirm awareness of the dashboard description and whether it is part of the FSD.,2026-07-09 16:26 (SAST): Created new PMO action from email request to confirm dashboard description/FSD coverage.
+Submit letter requesting preparation of Advanced training in Dubai: #260,,166,"August 3, 2026 5:13 PM",Francois,Medium,AF RTDMS,Not started,"10/9
+Discussed with Marjan","Moved from Update on 2026-08-03:
+3/8
+Letter submitted by Hameed
+
+2026-08-03 17:13 SAST — PMO cleanup: retained only the latest listed update in Update and moved the older entry to Update History."
+"Presales Documents: Assure Fintech, Assure Rev and Defend",PMO Product Implementation Methodologies,169,"August 11, 2026 5:18 PM",,,General,In progress,"3/8
+Shared with Alaa for review","12/7
+See email to team. Marcio to prepare for Defend
+
+2026-08-11 17:18 SAST — PMO cleanup: moved the older comment from Update to Update History and retained only the latest comment in Update."
+Security Assessment feedback,Re: High Priority MTN Assure Fintech security assessment: Go Live Blocked,170,"August 19, 2026 8:15 AM",Ibrahim,High,MTN MoMo,In progress,Submitted,"16/7
+With Ihab, then share
+
+10/7
+See email to Ibrahim
+
+2026-07-31 17:37 SAST — PMO cleanup: moved the two older updates to Update History and retained only the latest update in Update.
+
+Moved from Update on 2026-08-19:
+17/7
+Ihab to provide feedback by end of day on Monday
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Request decoded ASN.1 samples for BW Mascom feeds (MSC/IMS/SGSN/TAPIN/TAPOUT/NRTRD),BW Mascom Fw: TAPFILE & NRTRDE Sources  Data Validations,173,"August 19, 2026 6:45 PM",Aritra Mitra,Medium,BW Mascom,In progress,"[2026-08-19 18:45 SAST] Masa shared TAPFILE & NRTRDE source validation output (said files are 100% identical) and asked for review; requested the AI document for these sources (remaining sources to follow).
+
+[2026-08-19 18:42 SAST] Masa shared SGSN & IMS source validation output files and asked for review; requested that the AI & FSD documents for the sources be sent.","2026-08-19 18:45 SAST — Updated action: captured Masa’s request to review TAPFILE & NRTRDE validation outputs and to send the AI document; updated Email Subject.
+
+2026-08-19 18:42 SAST — Updated action: captured Masa’s request to review SGSN/IMS validation outputs and to provide AI & FSD documents; updated Email Subject.
+
+2026-08-12 12:24 SAST — Updated action with Masa’s confirmation that the IMS/SGSN encoded+decoded samples are being worked on and will be shared once completed; updated Email Subject to latest forward.
+
+2026-08-08 05:32 SAST — Logged request to Mascom for matching encoded (raw) files for the decoded IMS/SGSN samples and to provide encoded+decoded pairs for remaining sources; set Owner to Aritra; updated Email Subject.
+2026-08-03 18:08 SAST — Noted decoded sample files uploaded by Mascom; action to confirm folder access and view files.
+2026-08-04 17:43 SAST — Updated: Mascom cannot provide 19/04/2026 decoded samples (retention 3 months); flag need for alternative validation approach/date.
+2026-08-05 07:55 SAST — Added latest email update: propose requesting fresh encoded + decoded ASN.1 samples; pending confirmation.
+
+Moved from Update on 2026-08-11:
+2026-08-03 18:08 SAST — Decoded samples from Mascom were uploaded to the “DecodedSample Shared by Mascom” folder; confirm access/visibility.
+2026-08-04 17:43 SAST — Mascom advised mediation does not have the requested April (19/04/2026) files due to a 3‑month retention window; April samples cannot be provided from that source. Determine an alternative source/date for validation (or proceed with available July samples).
+2026-08-05 07:55 SAST — Francois suggests requesting new raw (encoded) ASN.1 samples and corresponding decoded samples for validation; awaiting confirmation from Aritra/Meheden.
+
+2026-08-11 17:18 SAST — PMO cleanup: retained only the latest comment in Update and moved older comments to Update History.
+
+[2026-08-12 09:10 SAST] Email follow-up: Francois requested urgent feedback from Masa on the updated encoded/decoded IMS & SGSN sample files.
+
+Moved from Update on 2026-08-19:
+[2026-08-12 09:10 SAST] Francois requested urgent feedback from Masa on whether the updated encoded and decoded IMS/SGSN sample files meet the requirement.
+
+2026-08-05 09:44 SAST — Request sent to Mascom (Rale) to share the corresponding raw (encoded) files for the decoded IMS/SGSN samples provided (matching file names/dates), and to follow the same approach for remaining sources.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comments to Update History."
+Collection server upgrade / improvement plan (Agent node upgrades + monitoring),AF RTDMS Agent node upgrade plans,181,"August 3, 2026 11:25 AM",Aman,High,AF RTDMS,In progress,2026-07-14 16:27 SAST — Waiting for details on the current collection server configuration (how the database is integrated with the MNOs) so the upgrade/improvement plan (incl. monitoring) can be prepared for submission to ATRA later this week.,2026-07-14 16:27 SAST — Created action from email: request for collection server configuration details to enable upgrade/improvement plan submission to ATRA.
+"Dell EMC Storage failure risk mitigation: 
+Procure spare drives.",AF RTDMS spare drives,182,"August 10, 2026 4:58 PM",Allison Coco,Medium,AF RTDMS,In progress,2026-07-17 06:44 SAST — Francois requested ordering the recommended spare drives as soon as possible due to failure risk and strict deadlines.,"15/7
+See plan from Aman and Francois’s response. Ali to get quote
+
+2026-07-31 17:37 SAST — PMO cleanup: moved the older update to Update History and retained only the latest operational update in Update."
+Machine Learning ML Planning,,188,"July 17, 2026 1:23 PM",Francois,Medium,BW Mascom,In progress,17/7 see email to Meghan,
+Data gathering and Control Framework,Fw: 'EXTERNAL:'Re: BW Mascom Data Gathering | Summary of Discussion | Questionnaire,192,"August 11, 2026 5:18 PM",Francois du Toit,High,BW Mascom,In progress,2026-08-11 07:37 SAST — Updated BW_Mascom_Questionnaire_V1.2.xlsx uploaded to the Clarifications folder; request Mascom to review and confirm if further questions/clarifications are needed.,"2026-08-11 07:37 SAST — Updated: questionnaires v1.2 uploaded to Clarifications folder; requested Mascom review and feedback/clarifications.
+2026-08-06 16:42 SAST — Updated action with latest request: clarify BW Mascom way forward (DG progress metric + sessions + questionnaire link; FSD control logic progress; ETL approach/tracking; Phase 1 controls prioritization concern).
+2026-07-31 18:25 SAST — Updated with latest inbound note: Mascom provided link to questionnaire clarifications for review.
+2026-07-28 07:43 SAST — Updated with latest request: confirm meeting time for tomorrow; start working on questionnaires (critical path).
+2026-07-22 19:17 SAST — Appended latest request: engage Rale with DG input requirements; updated Email Subject for traceability.
+2026-07-21 18:05 SAST — Updated action with latest email request for SPOCs and meeting date/time proposals; set Status to In progress; stored latest email subject.
+
+Moved from Update:
+2026-07-22 19:17 SAST — Francois asked Aritra to engage Rale with Latro’s data gathering (DG) input requirements.
+
+2026-07-21 18:05 SAST — Requested Mascom to nominate SPOCs/SMEs for data-gathering sessions (Day 1–7 teams) and propose suitable dates/times.
+
+2026-07-31 17:32 SAST — PMO cleanup: retained only the latest operational update in Update.
+
+Moved from Update on 2026-08-03:
+2026-07-31 18:25 SAST — Mascom shared a link to questionnaire clarifications for review.
+2026-07-28 07:43 SAST — Francois requested BW Mascom confirm a suitable time to meet tomorrow and start working on the DG questionnaires ASAP (critical path).
+
+2026-08-03 16:44 SAST — PMO cleanup: retained only the latest update (“3/8 — Aritra reviewing”) in Update and moved all older entries to Update History.
+
+Moved from Update on 2026-08-11:
+2026-08-06 16:42 SAST — Francois requests current status + plan: define DG progress metric; confirm number/duration of DG sessions next week; share questionnaire link; confirm control-logic progress in FSD; clarify ETL approach/tracking; and address Phase 1 controls prioritization (concern Mascom deprioritized).
+3/8 — 3 x 1 hour sessions requested for next week to finalize controls.
+5/8 — Aritra preparing Control Framework.
+
+2026-08-11 17:18 SAST — PMO cleanup: retained only the latest comment in Update and moved older comments to Update History."
+Marketing PPT and documents approval,,193,"July 21, 2026 8:32 AM",Francois,Medium,BW Mascom,In progress,"21/7
+See email to Rale",
+Plan Cisco field replacement,Fw: AF RTDMS Cisco devices swap,194,"July 31, 2026 5:33 PM",Aman,High,AF RTDMS,In progress,"2026-07-22 17:28 SAST — Start Cisco router/switch replacements on Sunday, 26 Jul (assuming devices released by Saturday). Proceed with installation irrespective of training; push back on ATRA request to delay until after training to protect November completion target.","2026-07-22 17:28 SAST — Updated plan: target start replacements Sunday 26 Jul; proceed irrespective of training; need devices released by Saturday; push back on ATRA request to delay.
+2026-07-22 07:13 SAST — Captured latest request: proceed with Cisco swap in parallel with training; explore local swap/field resources; training agenda shared (pending ATRA approval).
+
+Moved from Update:
+2026-07-22 07:13 SAST — Francois asked to proceed with the Cisco router/switch swap in parallel with training (MS4 depends on swap). Francois proposed finding local resources to assist with swap/field work and shared a draft training agenda (26 Jul–2 Sep) pending ATRA approval.
+
+21/7 see email to Aman
+
+2026-07-31 17:32 SAST — PMO cleanup: retained only the latest operational update in Update."
+TOR 13 evidence package – RTDMS file processing scenarios,AF RTDMS TOR 13 evidence,195,"August 10, 2026 5:00 PM",,Medium,AF RTDMS,Not started,"2026-07-21 18:51 SAST: ROR 13 committee requests evidence + demos for RTDMS file-processing scenarios (success, duplicate file, record-level duplicates, partial processing, processing status, corrupt file, failed processing) incl. screenshots, logs, DB evidence, and record-count reconciliation.",2026-07-21 18:51 SAST: Created action from email “AF RTDMS TOR 13 evidence” requesting TOR/ROR 13 evidence pack for RTDMS file-processing scenarios.
+"Dell & Cisco 5.1 payment — invoice next week, payment early Aug",Fw: Urgent: AF RTDMS Dell and Cisco replacement parts authorization,197,"August 11, 2026 5:18 PM",Francois Du Toit,High,AF RTDMS,In progress,2026-08-07 12:24 SAST: Francois proposes proceeding with payment based on Hazrat’s commitment that Dell & Cisco parts (except C8300-1N1S-4T2X and C-NIM-4X) will arrive in Jebel Ali by 25 Aug; requested Steve’s agreement to proceed.,"2026-08-07 12:24 SAST: Updated per email — proposal to proceed with payment based on confirmed Jebel Ali arrival (25 Aug) for most Dell/Cisco parts; awaiting Steve’s agreement.
+
+2026-08-05 10:09 SAST: Updated per email — requested confirmation of which Cisco items are in the ~25 Aug Jebel Ali partial delivery (green items), plus confirmation of remaining items’ Jebel Ali delivery and whether red-highlighted items were expedited.
+
+
+2026-08-04 12:17 SAST: Updated per email — requested confirmation of Dell ship readiness (9 Aug) + Kabul delivery estimate; requested Cisco Kabul delivery lead time + expediting update for overdue items; updated Email Subject to match latest thread subject.
+
+2026-07-22 19:13 SAST: Updated ETAs from Zippylink — Dell delivery by 9 Aug; Cisco export-compliance hold remains for router/NM cards; other line items mostly Aug ETAs.
+
+2026-07-22 11:12 SAST: Created action from email; captured expected invoice timing and early-Aug payment clearance.
+
+Moved from Update:
+2026-07-22 11:12 SAST: Expect invoice to be issued next week; payment clearance expected in the first week of August (per PO 26-0011 and PO 26-0012).
+
+2026-07-31 17:32 SAST — PMO cleanup: retained only the latest operational update in Update.
+
+Moved from Update on 2026-08-11:
+2026-08-05 10:09 SAST: Requested confirmation that the Cisco parts arriving in Jebel Ali ~25 Aug are the items highlighted in green; asked for confirmation of Jebel Ali delivery for the remaining items and whether the red-highlighted items were expedited.
+2026-08-04 12:17 SAST: Asked ZippyLink to confirm Dell parts ready-to-ship 9 Aug and provide expected delivery date to Kabul; requested Cisco delivery lead time to Kabul and expediting update for red-marked items (3 months past committed lead time).
+2026-07-22 19:13 SAST: Dell items ETA to Zippylink by 9 Aug 2026; most Cisco items now have Aug ETAs, but router/NM cards remain on export-compliance hold (router expected end-Sep; hold to be removed by end-Jul then manufacturing).
+
+2026-08-11 17:18 SAST — PMO cleanup: retained only the latest comment in Update and moved older comments to Update History."
+AFTEL DC Migration CR planning,,206,"July 31, 2026 5:32 PM",Francois,High,AF RTDMS,In progress,"31/7
+Marjan will gather more details on the AFTEL migration, specifically timing and to which building.","29/7 see email to Don and Marjan
+
+2026-07-31 16:56 SAST — PMO cleanup: moved the older update from Update to Update History and retained only the latest operational update in Update."
+VB PO starting August 2026,SA Lebara VersaBlocker PO,207,"July 29, 2026 8:06 AM",,,SA Lebara,In progress,29/7 see email to Syed,
+"BW Mascom AD Integration — request Mascom AD details (service account, DNs, security group)",Fw: 'EXTERNAL:'Re: BW Mascom AD Integration,208,"August 19, 2026 8:14 AM",,High,BW Mascom,In progress,[2026-08-18 17:03 SAST] Ahmad Bader advised the request should be handled by their team first; they will check with Mohamad Awab Alkhiami and revert.,"[2026-08-18 17:03 SAST] Updated from email: Ahmad Bader to handle internally first; will check with Mohamad Awab Alkhiami and revert.
+
+[2026-08-18 11:11 SAST] Updated from email: logged Francois follow-up requesting Meheden to revert ASAP; Users DN (point #3) still pending clarification.
+
+[2026-08-14 15:58 SAST] Updated from email: logged Mascom feedback details and that Users DN (point #3) needs clarification; updated Email Subject.
+
+[2026-08-12 12:26 SAST] Updated from email: Mascom confirmed due diligence complete and Diwetse Richard will share SSO details; updated Email Subject.
+
+[2026-08-12 09:05 SAST] Logged latest follow-up from Francois requesting urgent support to move BW Mascom AD integration forward; updated Email Subject.
+
+[2026-07-29 19:41 SAST] Updated next step: request service account + security group via Saviynt; awaiting Mascom to provide AD DNs after creation.
+[2026-08-05 07:50 SAST] Appended latest follow-up: requested status update on BW Mascom AD integration (email received).
+
+Moved from Update on 2026-08-11:
+[2026-07-29 19:41 SAST] Mascom requests the team to raise a Saviynt request for the service account and security group; after creation they will share the required AD attributes (Bind DN, User DN, Group DN).
+
+2026-08-11 17:17 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History.
+
+Moved from Update on 2026-08-19:
+[2026-08-18 11:11 SAST] Francois followed up with Meheden to revert ASAP (clarification on point #3 / Users DN still outstanding).
+
+[2026-08-14 15:58 SAST] Francois asked Meheden to elaborate on point #3 (Users DN) based on Mascom feedback; Mascom provided: service account rafm-versassure, bind DN CN=rafm-versassure,OU=Service Accounts,OU=Applications,DC=mascom,DC=bw and group DN CN=RAFM-Versassure Users,OU=Fraud & Revenue Assurance,OU=Finance,OU=Accounts,DC=mascom,DC=bw (Users DN still pending clarification).
+
+[2026-08-12 12:26 SAST] Mascom confirmed due diligence is complete; Diwetse Richard will share the relevant SSO details next.
+
+[2026-08-12 09:05 SAST] Francois requested urgent support from Mascom (Kaone) to proceed with AD integration and asked if LATRO can do anything to help.
+
+[2026-08-05 07:50 SAST] Follow-up sent to Mascom (Kaone) requesting a status update on the AD integration.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comments to Update History."
+Lebara – list configured vs non-configured controls + post-launch new controls,SA Lebara new control development,209,"July 29, 2026 5:28 PM",,Medium,SA Lebara,Not started,"2026-07-29 17:27 SAST — Badee requested a list of configured controls, non-configured controls, and any new controls added after project launch to assess MS team work vs original scope. Next: compile the control list and share internally before responding to Lebara.",2026-07-29 17:27 SAST — Created action from email “SA Lebara new control development”: request to prepare control inventory (configured/non-configured/new post-launch) for internal scope/workload assessment.
+Request full dump of Roshan Postpaid Billed CDRs (Jun–Jul 2026),AF RTDMS Fw: Roshan Postpaid Billed CDRs for Reconciliation,211,"July 30, 2026 8:34 AM",,Medium,AF RTDMS,Not started,"[2026-07-30 08:33 SAST] Request Najebi/ATRA to obtain full dump of postpaid billed CDRs for June and July 2026 in the agreed format, and ask all MNOs to upload the CSVs to the shared directory.",[2026-07-30 08:33 SAST] Created action from email: request for June/July 2026 postpaid billed CDR full dump + MNO CSV upload to shared directory.
+SA RBM cloud migration: timeline + impact assessment,SA RBM Cloud Migration,212,"August 11, 2026 5:17 PM",,High,SA RBM,In progress,"11/8
+Ghofrane had a call with Ashraf, he will align with Abdullah Alsheri regarding the migration.","2026-08-08 06:48 SAST — Updated SA RBM cloud migration action with latest internal CR scope/costing updates, timeline follow-ups, and draft RACI/estimation status.
+
+Moved from Update on 2026-08-11:
+2026-08-07 07:32 SAST — Follow-up internally asking for next steps; ElMehdi shared CR scope description + costing simulation, confirmed effort assumptions (BNOC 5h; Dev 5 working days; Services 3 working days; PM 4h) and requested this be added to the presales tracker.
+2026-08-04 07:57 SAST — Advised RBM we’re working on the CR details and requested the expected migration timeline.
+2026-08-04 07:54 SAST — Provided ElMehdi with a change description, draft RACI, and noted estimates still need confirmation (especially dev/app DB effort).
+
+2026-08-11 17:17 SAST — PMO cleanup: retained only the latest comment in Update and moved older comments to Update History."
+Technovision - LATRO Project Governance document,Re: Technovision - LATRO Project Governance document,213,"August 2, 2026 10:37 AM",Francois,,General,In progress,2/8 see email to Badee,
+Digitization/automation of Other services: Prepare and submit letter to ATRA,,214,"August 3, 2026 11:26 AM",Hameed,Medium,AF RTDMS,Not started,"31/7
+See WA to Hameed",
+Infrastructure re-validation and expansion requirements,MTN MoMo Infra re-assessment,216,"August 19, 2026 8:14 AM",Chinyama,High,MTN MoMo,In progress,"12/8
+Discussed with Chinyama","Moved from Update on 2026-08-19:
+11/8
+See email to Chinyama
+3/8
+See email to Ibrahim
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comments to Update History."
+Asiacell re-rating module scope & controls – provide update/confirmation,IQ Asiacell Reraring Scope finalization,217,"August 19, 2026 8:14 AM",Meheden Alkhatib,High,IQ Asiacell,In progress,"2026-08-17 16:50 SAST — Re-rating scope finalization actions from today’s call: Ammar to confirm if the re-rating engine can rate only sample/filtered records (specific scenarios/bundles/cases) vs all records, and to share configuration support level (Huawei charging configs) before next call. Francois to close BRD once re-rating functionality is agreed.","2026-08-17 16:50 SAST — Updated with latest re-rating scope finalization actions and stored the email subject.
+
+2026-08-06 15:42 SAST — Noted Francois follow-up: requested responses to Asiacell clarification points by Sunday.
+
+2026-08-06 14:05 SAST — Updated action with Asiacell clarification questions for re-rating scope (sampling, segment coverage, discrepancy workflow/SLA, run cadence/performance, roaming dependencies, backdated scope).
+
+2026-08-04 13:17 SAST — Appended note that Asiacell will be updated with the agreed controls and rate plans will be limited to 3.
+
+2026-08-04 11:42 SAST — Updated action with confirmation that all 6 re-rating controls are achievable and no scope changes required; noted dependency on customer-provided rating configuration and that there is no inherent limit on number of rate plans/trees.
+
+2026-08-03 14:41 SAST — Logged request for update on re-rating scope/controls; action remains with Meheden for response.
+
+Moved from Update on 2026-08-06:
+2026-08-06 14:05 SAST — Asiacell requested clarifications on re-rating scope: full vs sampled CDR coverage (sampling approach/size/frequency), prepaid/postpaid coverage, discrepancy workflow (alerts/tickets/ownership/SLA), batch vs near real-time cadence & performance constraints, roaming re-rating dependencies (TAP/IOT, partner rates), and whether backdated re-rating is in scope.
+
+2026-08-04 13:17 SAST — Abdulrahman will update the Asiacell team with the agreed controls at a high level and will limit the number of rate plans considered to 3.
+
+2026-08-04 11:42 SAST — Meheden confirmed the proposed Assure-Rev re-rating module scope aligns with standard capabilities; all 6 controls are technically achievable for BRD inclusion; no revisions needed. Rating Engine-based controls require customer-provided charging configuration (rate plans/trees, tariffs, bundles/discounts, etc.); no inherent limitation on the number of rate plans/sub-rating plans/trees—scope depends on completeness/accuracy of provided configuration.
+
+2026-08-06 15:44 SAST — PMO cleanup: retained only the latest comment in Update and moved all older comments to Update History.
+
+Moved from Update on 2026-08-19:
+2026-08-06 15:42 SAST — Francois asked Meheden to revert/answer Asiacell’s clarification points by Sunday (and schedule a call if needed).
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Mascom ICT feed – confirm associated controls,BW Mascom New Data Feed:  ICT,219,"August 19, 2026 8:13 AM",Francois du Toit,Medium,BW Mascom,In progress,2026-08-12 09:13 SAST — Reminder from Francois to Aritra to review the Mascom ICT feed controls and update on feasibility.,"2026-08-12 09:13 SAST — Update: added reminder from Francois to Aritra to follow up on ICT feed feasibility.
+2026-08-04 08:04 SAST — Created action from email: request to confirm controls associated with Mascom ICT feed.
+2026-08-05 07:20 SAST — Updated from email: asked Aritra to assess ICT feed controls + feasibility and report back.
+
+Moved from Update on 2026-08-11:
+2026-08-04 08:04 SAST — Francois asked Mascom to confirm which controls (existing + additional) are associated with the new Mascom ICT data feed.
+
+2026-08-11 17:15 SAST — PMO cleanup: retained only the latest comment in Update and moved the older comment to Update History.
+
+Moved from Update on 2026-08-19:
+2026-08-05 07:20 SAST — Francois requested Aritra to review the Mascom ICT feed controls and confirm feasibility, and provide an update.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Other services receive outstanding data from ATRA/OPCOs,,220,"August 19, 2026 8:13 AM",Hameed,High,AF RTDMS,In progress,12/8 bits and pieces are shared on WA and email,"Moved from Update on 2026-08-19:
+4/8 discuss in weekly PMO
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+"BW Mascom – clarify backup sizing scope/justification (MASCOM 13TB, CW 4TB) + provide frequency/retention/sizing basis",BW Mascom Backup requirements,224,"August 19, 2026 8:13 AM",Mohamad / Soufiane / Aman (input needed),High,BW Mascom,In progress,"2026-08-18 07:54 SAST — Francois specified BW Mascom backup requirements: dedicated NFS storage needed to protect the Assure Rev RAFM platform; initial sizing estimates: DB 10GB, OpenSearch 500GB (grow to ~1TB), Hadoop 1TB (grow to ~1.5TB), and expected NFS capacity ~12TB for distributed data backups (2 full + incrementals retained 30 days). Request: once NFS is provisioned, share IP address and storage path for configuration/testing.","[2026-08-08 05:32 SAST] Created action from email: request to clarify backup scope/justification and sizing details for BW Mascom.
+2026-08-18 07:54 SAST — Updated from email “BW Mascom Backup requirements”: captured NFS backup requirements, initial sizing/growth estimates, retention policy note, and request for NFS IP/path to configure and test backups.
+
+Moved from Update on 2026-08-19:
+[2026-08-08 05:32 SAST] Aman requested clarification/technical justification for the proposed backup storage (MASCOM 13TB, CW 4TB): confirm backup scope (config only vs full images incl. OS/app data/DB/logs), backup frequency, retention and sizing calculations; requirement may not be approved without justification.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Cisco C8300 encrypted/IPsec throughput upgrade (HSEC) — confirm licenses + quote,Re: AF RTDMS Cisco Encrypted/IPSEC throughput,227,"August 19, 2026 7:36 PM",Hazrat,High,AF RTDMS,In progress,2026-08-19 19:35 SAST: PO issued/attached; awaiting ZippyLink invoice to proceed with advance payment.,"2026-08-10 06:26 SAST: Created action from email — requested confirmation of HSEC/throughput license for 1 Gbps IPsec on DR-R1/DR-R2 C8300 routers, plus quotation and check against original Cisco order.
+2026-08-11 18:22 SAST: Updated from email — request for annual pricing option due to delivery delays impacting cashflow.
+2026-08-19 19:35 SAST: PO issued/attached; requested invoice from ZippyLink so advance payment can be made.
+
+Moved from Update on 2026-08-19:
+2026-08-10 06:26 SAST: Request to confirm required HSEC authorization + throughput tier license to raise C8300 encrypted/IPsec throughput from 250 Mbps to ≥1 Gbps per router (DR-R1/DR-R2) and provide quotation; also verify if entitlements were included in original Cisco order.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+SA Lebara FM API integration – scope review (API details & call structure),Re: SA Lebara FM API integration Scope review,229,"August 19, 2026 8:13 AM",Francois (Lebara API details) / Daniel (Gamma API details),Medium,SA Lebara,In progress,2026-08-18 11:23 SAST — Follow-up sent to Daniel requesting the latest status on the SA Lebara FM API integration scope review action.,"2026-08-18 11:23 SAST — Updated from email follow-up: requested latest update from Daniel.
+2026-08-10 17:11 SAST — Created from email: captured action list and set status to In progress.
+
+Moved from Update on 2026-08-19:
+2026-08-10 17:11 SAST — Post-call actions: Francois to request Lebara API details & call structure; Daniel to provide Pronto-facing API details & call structure for receiving/processing fraud complaints.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Live feeds in staging environment,,230,"August 19, 2026 8:13 AM",Samir,High,IQ Asiacell,In progress,"18/8
+Motivation shared with Cyber, waiting for response","Moved from Update on 2026-08-19:
+11/8
+Samir to send motivation for >4 months access to live feeds in staging
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Plan Geolocation trip: 19 October,,231,"August 21, 2026 7:25 AM",Francois,High,MA INWI,In progress,"21/8
+See email to Khalid
+11/8
+See email to Dave",
+BW Mascom — Assure Rev machine learning capabilities: confirm delivery approach with Moamen/TV and revert to Meghan,Re: BW Mascom - Assure Rev Machine Learning Capabilities,232,"August 19, 2026 8:13 AM",Badee Awwad / Ihab Al Shayeb,Medium,BW Mascom,In progress,"2026-08-17 17:43 SAST — Badee discussed AssureRev ML capabilities with Moamen; agreed to schedule additional sessions with the development team this week to deepen understanding, then align with Meghan on any enhancements needed.","2026-08-17 17:43 SAST — Updated from email “Re: BW Mascom - Assure Rev Machine Learning Capabilities” (sessions with dev team planned this week; then align with Meghan).
+[2026-08-12 09:11 SAST] Created action from email reminder (BW Mascom — Assure Rev ML capabilities); logged next step to align with Moamen/TV and reply to Meghan.
+
+Moved from Update on 2026-08-19:
+[2026-08-12 09:11 SAST] Francois followed up/reminded Badee to progress the request to confirm Assure Rev ML capabilities vs contractual scope; next step is to take this with Moamen/TV and revert with delivery approach for the required fraud modules.
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Proceed with Cisco IPSEC (HSEC/throughput tier) license order with 6‑monthly upfront payments,Re: AF RTDMS Re: Activate Secure Automated WAN to begin your journey,233,"August 19, 2026 1:32 PM",Hazrat,Medium,AF RTDMS,In progress,"[2026-08-19 13:31 SAST] Hazrat (ZippyLink) confirmed the quote is still valid; proceed with issuing the PO with $4,000 payable on PO placement and the balance due in 6 months. Maria to prepare the PO.
+
+17/8
+see email to Hashmatullah to ask if we need to order from LNS","[2026-08-19 13:31 SAST] Updated from email: confirmed quotation still valid and requested Maria prepare PO; payment terms $4,000 on PO placement with balance due in 6 months; updated Email Subject.
+
+[2026-08-14 08:39 SAST] Email update processed: added request to confirm placing the PO from LNS; updated Email Subject to latest forwarded subject.
+
+[2026-08-13 07:43 SAST] Updated with payment options and Francois recommendation (option 2).
+
+[2026-08-12 13:34 SAST] Logged request to proceed with Cisco IPSEC quote and PO placement payment details.
+
+Moved from Update on 2026-08-19:
+[2026-08-14 08:39 SAST] Francois asks whether to place the PO from LNS (per Steve’s agreement that option 2 is better).
+
+[2026-08-13 07:43 SAST] Clarified payment options from Hazrat: (1) $3,680/month for next 6 months, or (2) $4,000 upfront + remaining $18,080 after 6 months; Francois recommends option 2.
+
+[2026-08-12 13:34 SAST] Francois requests approval to proceed with the Cisco IPSEC quote: Hazrat will own the 36‑month order with 6‑monthly upfront payments ($3,780 on PO placement).
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comments to Update History."
+MTN MoMo — Monitoring and alerting (EVA DB connectivity),MTN MoMo Monitoring and alerting,234,"August 19, 2026 8:13 AM",,High,MTN MoMo,In progress,2026-08-17 17:43 SAST — Aman: manual monitoring exists and can likely be extended to include EVA DB connection; automated monitoring + BNOC NMS integration design complete incl. EVA DB monitoring but won’t be ready before mid‑September.,"2026-08-17 17:43 SAST — Updated from email “Fw: MTN MoMo Monitoring and alerting” (Aman response on manual vs automated monitoring timelines).
+2026-08-14 08:10 SAST — Created action from email “MTN MoMo Monitoring and alerting” requesting EVA DB connectivity/data availability monitoring in reports.
+
+Moved from Update on 2026-08-19:
+2026-08-14 08:10 SAST — Request guidance on monitoring strategy and timeline to incorporate EVA DB connectivity/data availability monitoring into the solution and BNOC monitoring; report should flag periods of source unavailability/incomplete extraction to avoid false-positive reconciliation exceptions (FAC/Go Live Zambia next week).
+
+2026-08-19 — PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+TOR 6 & 7: request ATRA/MoF feedback and closure decision,Fw: AF RTDMS TOR Review,235,"August 14, 2026 8:41 AM",Hameed Rahimi,Medium,AF RTDMS,In progress,"2026-08-14 08:40 SAST — Request ATRA (Irfanullah Safi) support on TOR Points 6 & 7: confirm whether they will engage MoF/Committee to resolve, or advise to consider these items closed.",2026-08-14 08:40 SAST — Created action from email “Fw: AF RTDMS TOR Review” requesting ATRA feedback/next step on TOR 6 & 7.
+MTN MoMo Support from BNOC for NW and technical customer engagements,MTN MoMo Assure Fintech Support,236,"August 17, 2026 10:30 AM",Aman,Medium,MTN MoMo,In progress,"17/8
+see emial to Aman",
+ZM MTN Optional PO,,237,"August 17, 2026 1:15 PM",Francois,High,MTN MoMo,In progress,"17/8
+Ngoga will check with Kalombo. See teams with Ngonga",
+Lebara: Coordinate Mobily approval + temporary internet for Hadoop 5th node,SA Lebara Re: HDD Swap & Hadoop 5th Node Installation,238,"August 19, 2026 8:12 AM",Aman Ehsan,Medium,SA Lebara,Not started,[2026-08-18 07:46 SAST] Follow-up: Francois asked Hussain to support while Syed is out; request remains to enable temporary Internet access for 2 weeks for server IP 192.168.100.56 so the 5th Hadoop node can be installed/configured.,"[2026-08-18 07:46 SAST] Updated from email follow-up: asked Hussain to support enabling temporary Internet access (2 weeks) for server IP 192.168.100.56 while Syed is out.
+
+[2026-08-18 07:43 SAST] Created action from email request (HDD Swap & Hadoop 5th Node Installation).
+
+[2026-08-18 07:43 SAST] Request: coordinate with Mobily to obtain installation approval for adding a 5th Hadoop node (Supermicro 1U server, ~150–250W) and enable temporary Internet access for 2 weeks for server IP 192.168.100.56.
+
+[2026-08-19] PMO cleanup: retained latest Update only and moved older Update comment to Update History."
+Solution design acceptance,,239,"August 18, 2026 9:47 AM",Francois,High,IQ Asiacell,In progress,"18/8
+See teams with Rozh,  Use annex 3: service acceptance form. Include BRD, TDT and PIP",
+Future storage forecast and usage planning,,240,"August 18, 2026 10:17 AM",Abhijit,Medium,AF RTDMS,In progress,"18/8
+See One Note: AF RTDMS Storage capacity 30% - 2026.08.16. Abhijit to determine cleaning up schedule. See email from Aman to Abhijit on 17 Aug",
+Change weekly call time with Ashraf - see WA from him on 18 Aug,,241,"August 18, 2026 10:49 AM",,High,SA RBM,In progress,18/8 see WA from Ashraf,
+,,242,"August 18, 2026 5:27 PM",,,,Not started,,
+,,243,"August 18, 2026 5:27 PM",,,,Not started,,
+Get new VNs for TCG from Maninder,,244,"August 18, 2026 5:28 PM",Francois,Medium,AF AWCC,In progress,"18/8 
+see email to Maninder",
+T.1.2 Pen test and security assessment,Re: AF RTDMS Critical Actions Tracker,245,"August 18, 2026 7:07 PM",Aman,Urgent,AF RTDMS,In progress,18/8 see email to Aman,
+Billing system migration CR planning and data feed evaluation,BW Mascom New Billing system,246,"August 19, 2026 8:47 AM",Aritra,Urgent,BW Mascom,In progress,"19/8 08:47
+Request urgent gap analysis for new Mascom billing & charging system (CST): identify new adaptors required and impacts on Controls; scope additional work ahead of end-Aug go-live.
+
+19/8
+see email to Aritra",2026-08-19 08:47 (Africa/Johannesburg) — Updated action with urgent request for CST billing system gap analysis; captured email subject.
+RA On Site travel: 6 to 12 Sept,BW Mascom BA Visit budget,247,"August 21, 2026 12:20 PM",Dave,High,BW Mascom,Done,"21/8
+See email to Dave with budget",
+Review updated Mascom PIP (RAFM Implementation) v1.3,BW Mascom PIP,248,"August 21, 2026 3:12 PM",,,BW Mascom,Not started,2026-08-21 15:11 SAST — Francois shared an updated Mascom RAFM Implementation PIP (V1.3) and requested Meheden and Mohamad to review the attached update.,2026-08-21 15:11 SAST — Created action from email “BW Mascom PIP”; logged request to review updated Mascom RAFM Implementation PIP V1.3.
+ZM MTN Contract addendum for 11 Optional controls,"ZM MTN MoMo Assure Fintech: Contract ",249,"August 21, 2026 3:44 PM",Allison,Medium,General,In progress,"21/8
+see email to Allison",
