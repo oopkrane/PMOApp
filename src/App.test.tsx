@@ -86,6 +86,9 @@ import App from "./App";
 beforeEach(() => {
   window.localStorage.clear();
   testState.saved = null;
+  tasks.forEach((task) => {
+    task.Status = "In progress";
+  });
 });
 
 afterEach(() => cleanup());
@@ -148,5 +151,19 @@ describe("AI model setup", () => {
     fireEvent.click(alternative);
     expect(alternative).toBeChecked();
     expect(screen.getByText(/Used by AI Focus, Ask PMO/i)).toBeInTheDocument();
+  });
+});
+
+describe("completed action filtering", () => {
+  it("hides done actions without deleting them", async () => {
+    tasks[2]!.Status = "Done";
+    render(<App />);
+
+    expect(await screen.findByText("Action 3")).toBeInTheDocument();
+    const toggle = screen.getByRole("checkbox", { name: /Hide done/i });
+    fireEvent.click(toggle);
+    expect(screen.queryByText("Action 3")).not.toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(screen.getByText("Action 3")).toBeInTheDocument();
   });
 });

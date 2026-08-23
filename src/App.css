@@ -70,12 +70,12 @@
   display: block;
 }
 .workspace-switcher strong {
-  font: 700 13px "Manrope";
+  font: 700 14px "Manrope";
 }
 .workspace-switcher span {
   margin-top: 1px;
   color: #8a8792;
-  font-size: 10px;
+  font-size: 11px;
 }
 .primary-nav {
   margin-top: 20px;
@@ -98,7 +98,7 @@
   gap: 10px;
   border-radius: 7px;
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 .nav-item:hover,
@@ -128,7 +128,7 @@
   justify-content: space-between;
   padding: 0 9px 7px;
   color: #9995a1;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -142,7 +142,7 @@
   gap: 8px;
   border-radius: 7px;
   text-align: left;
-  font-size: 12px;
+  font-size: 13px;
 }
 .project-link:hover,
 .project-link.selected {
@@ -299,7 +299,7 @@
   gap: 7px;
   border-radius: 7px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
 }
 .primary-button {
@@ -333,9 +333,10 @@
   background: #eef7f1;
 }
 .page-content {
-  max-width: 1500px;
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
-  padding: 35px 34px 60px;
+  padding: 30px 22px 54px;
 }
 .page-heading {
   display: flex;
@@ -354,19 +355,19 @@
 .eyebrow {
   margin: 0 0 4px !important;
   color: #7c6de0 !important;
-  font-size: 9px !important;
+  font-size: 11px !important;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
 .page-heading h1 {
   margin: 0;
-  font: 700 25px/1.2 "Manrope";
+  font: 700 30px/1.2 "Manrope";
   letter-spacing: -0.03em;
 }
 .page-heading p {
   margin: 5px 0 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 .stats-grid {
   margin-top: 28px;
@@ -375,8 +376,8 @@
   gap: 12px;
 }
 .stat-card {
-  min-height: 105px;
-  padding: 19px;
+  min-height: 112px;
+  padding: 20px;
   display: flex;
   gap: 13px;
   border: 1px solid var(--line);
@@ -412,17 +413,17 @@
 }
 .stat-card span {
   color: #85818e;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
 }
 .stat-card strong {
   margin-top: 1px;
-  font: 700 23px "Manrope";
+  font: 700 28px "Manrope";
 }
 .stat-card small {
   margin-top: 3px;
   color: #aaa6b0;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .workspace-card {
@@ -434,7 +435,7 @@
   box-shadow: 0 2px 7px #29223508;
 }
 .view-toolbar {
-  min-height: 57px;
+  min-height: 61px;
   padding: 10px 13px;
   display: flex;
   justify-content: space-between;
@@ -457,7 +458,7 @@
   border-bottom: 2px solid transparent;
   background: transparent;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
 }
 .view-tabs button.active {
@@ -470,8 +471,8 @@
   gap: 7px;
 }
 .search-box {
-  width: 210px;
-  height: 33px;
+  width: 230px;
+  height: 36px;
   padding: 0 9px;
   display: flex;
   align-items: center;
@@ -490,10 +491,10 @@
   outline: 0;
   background: transparent;
   color: #393643;
-  font-size: 10px;
+  font-size: 12px;
 }
 .select-wrap {
-  height: 33px;
+  height: 36px;
   padding: 0 8px;
   display: flex;
   align-items: center;
@@ -509,10 +510,48 @@
   outline: 0;
   background: transparent;
   appearance: none;
-  font-size: 10px;
+  font-size: 12px;
+}
+.hide-done-toggle {
+  min-height: 36px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #625e6a;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: white;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.hide-done-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.hide-done-toggle > span {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  border: 1px solid #c9c5cf;
+  border-radius: 5px;
+  background: white;
+}
+.hide-done-toggle input:checked + span {
+  color: white;
+  border-color: var(--purple);
+  background: var(--purple);
+}
+.hide-done-toggle:has(input:focus-visible) {
+  border-color: #9a90e4;
+  box-shadow: 0 0 0 3px #6557d814;
 }
 .result-bar {
-  height: 34px;
+  height: 37px;
   padding: 0 14px;
   display: flex;
   align-items: center;
@@ -520,7 +559,7 @@
   color: #96929e;
   background: #fcfcfd;
   border-bottom: 1px solid #efedf2;
-  font-size: 9px;
+  font-size: 11px;
 }
 .result-bar strong {
   color: #65616d;
@@ -533,11 +572,11 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .table-scroll {
-  max-height: calc(100vh - 365px);
+  max-height: calc(100vh - 360px);
   min-height: 260px;
   overflow: auto;
 }
@@ -552,7 +591,7 @@
   position: sticky;
   top: 0;
   z-index: 3;
-  height: 35px;
+  height: 39px;
   padding: 0 10px;
   color: #908c97;
   background: #f8f8fa;
@@ -560,7 +599,7 @@
   border-right: 1px solid #edebef;
   text-align: left;
   white-space: nowrap;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
 }
 .task-table th:nth-child(1),
@@ -570,18 +609,18 @@
 }
 .task-table th:nth-child(2),
 .task-table td:nth-child(2) {
-  width: 260px;
-  min-width: 260px;
+  width: 290px;
+  min-width: 290px;
 }
 .task-table th:nth-child(3),
 .task-table td:nth-child(3) {
-  width: 250px;
-  min-width: 250px;
+  width: 270px;
+  min-width: 270px;
 }
 .task-table th:nth-child(4),
 .task-table td:nth-child(4) {
-  width: 155px;
-  min-width: 155px;
+  width: 170px;
+  min-width: 170px;
 }
 .task-table th:nth-child(5),
 .task-table td:nth-child(5) {
@@ -614,13 +653,13 @@
   min-width: 250px;
 }
 .task-table td {
-  height: 43px;
-  padding: 5px 9px;
+  height: 48px;
+  padding: 6px 10px;
   color: #5f5b67;
   background: white;
   border-bottom: 1px solid #efedf1;
   border-right: 1px solid #f0eef2;
-  font-size: 10px;
+  font-size: 12px;
 }
 .task-table tr:hover td {
   background: #fbfaff;
@@ -642,7 +681,7 @@
   border: 1px solid transparent;
   outline: 0;
   background: transparent;
-  font-size: 10px;
+  font-size: 12px;
 }
 .task-table input:focus {
   border-color: #b7afea;
@@ -662,7 +701,7 @@
   cursor: text;
   text-align: left;
   white-space: pre-line;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.45;
 }
 .update-preview-text {
@@ -689,7 +728,7 @@
   pointer-events: none;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.55;
 }
@@ -732,7 +771,7 @@
   border: 0;
   outline: 0;
   background: white;
-  font-size: 10px;
+  font-size: 12px;
 }
 .update-composer > div {
   display: flex;
@@ -767,7 +806,7 @@
   background: transparent;
   cursor: pointer;
   text-align: left;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 .doc-icon,
@@ -796,7 +835,7 @@
   border-radius: 10px;
   outline: 0;
   appearance: none;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
 }
 .pill-select.green,

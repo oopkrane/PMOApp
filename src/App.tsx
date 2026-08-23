@@ -152,6 +152,7 @@ function App() {
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [priorityFilter, setPriorityFilter] = useState("All priorities");
   const [projectFilter, setProjectFilter] = useState("All projects");
+  const [hideDone, setHideDone] = useState(false);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notice, setNotice] = useState("");
@@ -228,6 +229,7 @@ function App() {
         return false;
       if (statusFilter !== "All statuses" && task.Status !== statusFilter)
         return false;
+      if (hideDone && completionPattern.test(task.Status.trim())) return false;
       if (
         priorityFilter !== "All priorities" &&
         task.Priority !== priorityFilter
@@ -240,7 +242,7 @@ function App() {
         )
       );
     });
-  }, [priorityFilter, projectFilter, query, statusFilter, tasks]);
+  }, [hideDone, priorityFilter, projectFilter, query, statusFilter, tasks]);
 
   const selectedTask = tasks.find((task) => task._key === selectedKey) ?? null;
   const completed = tasks.filter((task) =>
@@ -840,6 +842,17 @@ function App() {
                     onChange={setPriorityFilter}
                     options={["All priorities", ...priorities]}
                   />
+                  <label className="hide-done-toggle">
+                    <input
+                      type="checkbox"
+                      checked={hideDone}
+                      onChange={(event) => setHideDone(event.target.checked)}
+                    />
+                    <span>
+                      <Check size={13} />
+                    </span>
+                    Hide done
+                  </label>
                   <button
                     className="icon-button bordered"
                     title="Restore original imported data"
@@ -855,12 +868,14 @@ function App() {
                 </span>
                 {(query ||
                   statusFilter !== "All statuses" ||
-                  priorityFilter !== "All priorities") && (
+                  priorityFilter !== "All priorities" ||
+                  hideDone) && (
                   <button
                     onClick={() => {
                       setQuery("");
                       setStatusFilter("All statuses");
                       setPriorityFilter("All priorities");
+                      setHideDone(false);
                     }}
                   >
                     Clear filters <X size={13} />
