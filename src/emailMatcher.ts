@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ProjectEmail } from "./gmail";
+import { DEFAULT_OLLAMA_MODEL, OllamaModelNameSchema } from "./ollama";
 import type { Task } from "./types";
 
 const MatchResponseSchema = z.object({
@@ -52,7 +53,9 @@ const outputFormat = {
 export async function matchEmailToAction(
   email: ProjectEmail,
   projectTasks: Task[],
+  model = DEFAULT_OLLAMA_MODEL,
 ): Promise<EmailActionDecision> {
+  const validatedModel = OllamaModelNameSchema.parse(model);
   const candidates = projectTasks.map((task) => ({
     id: task.ID,
     action: task.Action,
@@ -64,7 +67,7 @@ export async function matchEmailToAction(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "qwen3.5:9b",
+      model: validatedModel,
       stream: false,
       think: false,
       format: outputFormat,

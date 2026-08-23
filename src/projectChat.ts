@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_OLLAMA_MODEL, OllamaModelNameSchema } from "./ollama";
 import type { Task } from "./types";
 
 const QuestionSchema = z.string().trim().min(1).max(2_000);
@@ -70,9 +71,11 @@ export async function askProjectActions(
   question: string,
   tasks: Task[],
   history: ProjectChatHistoryItem[],
+  model = DEFAULT_OLLAMA_MODEL,
 ): Promise<ProjectChatAnswer> {
   const validatedQuestion = QuestionSchema.parse(question);
   const validatedHistory = HistorySchema.parse(history.slice(-10));
+  const validatedModel = OllamaModelNameSchema.parse(model);
   const records = tasks.map((task) => ({
     id: task.ID,
     action: task.Action,
@@ -88,7 +91,7 @@ export async function askProjectActions(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "qwen3.5:9b",
+      model: validatedModel,
       stream: false,
       think: false,
       format: outputFormat,

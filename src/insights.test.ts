@@ -51,13 +51,16 @@ describe("local AI insight boundary", () => {
       ),
     );
 
-    const result = await generateProjectInsights(tasks);
+    const result = await generateProjectInsights(tasks, "qwen3:4b");
     expect(result.projects[0]?.actions).toHaveLength(3);
     expect(result.projects[0]?.actions[0]?.key).toBe("key-1");
     expect(fetch).toHaveBeenCalledWith(
       "/api/ollama/api/chat",
       expect.objectContaining({ method: "POST" }),
     );
+    expect(
+      JSON.parse(String(vi.mocked(fetch).mock.calls[0]?.[1]?.body)).model,
+    ).toBe("qwen3:4b");
   });
 
   it("fills an invented model reference using recorded priority", async () => {

@@ -52,11 +52,16 @@ import {
 } from "./gmailConfig";
 import {
   generateProjectInsights,
-  insightModelName,
   loadSavedInsights,
   saveInsights,
   type AiInsightResult,
 } from "./insights";
+import {
+  loadOllamaModel,
+  saveOllamaModel,
+  scanInstalledOllamaModels,
+  type InstalledOllamaModel,
+} from "./ollama";
 import { loadWorkspaceView, saveWorkspaceView } from "./preferences";
 import {
   askProjectActions,
@@ -132,7 +137,10 @@ function blankTask(id: string, key: string): Task {
 
 function App() {
   const [initialInsights] = useState(loadSavedInsights);
-  const [page, setPage] = useState<"workspace" | "gmail-setup">("workspace");
+  const [page, setPage] = useState<"workspace" | "gmail-setup" | "ai-setup">(
+    "workspace",
+  );
+  const [ollamaModel, setOllamaModel] = useState(loadOllamaModel);
   const [gmailConfig, setGmailConfig] = useState(() =>
     loadGmailConfig(import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim()),
   );
@@ -341,7 +349,7 @@ function App() {
     setInsightLoading(true);
     setInsightError("");
     try {
-      setInsights(await generateProjectInsights(tasks));
+      setInsights(await generateProjectInsights(tasks, ollamaModel));
       setInsightGeneratedAt(new Date());
       setInsightsStale(false);
     } catch (reason) {
@@ -394,7 +402,11 @@ function App() {
         const projectTasks = workingTasks.filter(
           (task) => task.Project === email.project,
         );
-        const decision = await matchEmailToAction(email, projectTasks);
+        const decision = await matchEmailToAction(
+          email,
+          projectTasks,
+          ollamaModel,
+        );
 
         await markEmailRead(accessToken, email.messageId);
         if (decision.kind === "match") {
@@ -514,7 +526,12 @@ function App() {
     setChatLoading(true);
     setChatError("");
     try {
-      const answer = await askProjectActions(question, tasks, history);
+      const answer = await askProjectActions(
+        question,
+        tasks,
+        history,
+        ollamaModel,
+      );
       setChatMessages((current) => [
         ...current,
         {
@@ -614,6 +631,12 @@ function App() {
         </div>
         <div className="sidebar-footer">
           <button
+            className={`nav-item ${page === "ai-setup" ? "active" : ""}`}
+            onClick={() => setPage("ai-setup")}
+          >
+            <BrainCircuit size={17} /> AI model setup
+          </button>
+          <button
             className={`nav-item ${page === "gmail-setup" ? "active" : ""}`}
             onClick={() => setPage("gmail-setup")}
           >
@@ -645,9 +668,11 @@ function App() {
             <strong>
               {page === "gmail-setup"
                 ? "Gmail setup"
-                : projectFilter === "All projects"
-                  ? "Action tracker"
-                  : projectFilter}
+                : page === "ai-setup"
+                  ? "AI model setup"
+                  : projectFilter === "All projects"
+                    ? "Action tracker"
+                    : projectFilter}
             </strong>
           </div>
           {page === "workspace" ? (
@@ -713,10 +738,19 @@ function App() {
             testing={gmailTesting}
             status={gmailConnectionStatus}
             error={gmailError}
+            model={ollamaModel}
             onSave={updateGmailConfig}
             onTest={(config) => void testGmailConnection(config)}
             onDisconnect={() => void disconnectConfiguredGmail()}
             onReset={resetGmailConfig}
+          />
+        ) : page === "ai-setup" ? (
+          <OllamaSetupPage
+            selectedModel={ollamaModel}
+            onSelect={(model) => {
+              setOllamaModel(saveOllamaModel(model));
+              markInsightsStale();
+            }}
           />
         ) : (
           <div className="page-content">
@@ -858,6 +892,7 @@ function App() {
                   error={insightError}
                   generatedAt={insightGeneratedAt}
                   stale={insightsStale}
+                  model={ollamaModel}
                   onAnalyze={() => void analyzeTasks()}
                   onSelect={setSelectedKey}
                 />
@@ -881,6 +916,7 @@ function App() {
           messages={chatMessages}
           loading={chatLoading}
           error={chatError}
+          model={ollamaModel}
           onAsk={(question) => void askPmo(question)}
           onClose={() => setChatOpen(false)}
           onClear={() => {
@@ -950,11 +986,181 @@ function App() {
   );
 }
 
+function OllamaSetupPage({
+  selectedModel,
+  onSelect,
+}: {
+  selectedModel: string;
+  onSelect: (model: string) => void;
+}) {
+  const [models, setModels] = useState<InstalledOllamaModel[]>([]);
+  const [scanning, setScanning] = useState(true);
+  const [scanError, setScanError] = useState("");
+  const [lastScanned, setLastScanned] = useState<Date | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    scanInstalledOllamaModels()
+      .then((installed) => {
+        if (!active) return;
+        setModels(installed);
+        setLastScanned(new Date());
+      })
+      .catch((reason: unknown) => {
+        if (active) {
+          setScanError(
+            reason instanceof Error ? reason.message : "Model scan failed.",
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setScanning(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function scanModels() {
+    setScanning(true);
+    setScanError("");
+    try {
+      setModels(await scanInstalledOllamaModels());
+      setLastScanned(new Date());
+    } catch (reason) {
+      setScanError(
+        reason instanceof Error ? reason.message : "Model scan failed.",
+      );
+    } finally {
+      setScanning(false);
+    }
+  }
+
+  const selectedInstalled = models.some(
+    (model) => model.name === selectedModel,
+  );
+
+  return (
+    <div className="page-content gmail-setup-page ai-setup-page">
+      <section className="page-heading ai-settings-heading">
+        <div className="heading-icon">
+          <BrainCircuit size={23} />
+        </div>
+        <div>
+          <p className="eyebrow">LOCAL AI CONFIGURATION</p>
+          <h1>AI model setup</h1>
+          <p>Select one installed Ollama model for every AI feature.</p>
+        </div>
+      </section>
+
+      <section className="settings-card model-settings-card">
+        <header>
+          <div>
+            <span className="settings-step">
+              <BrainCircuit size={15} />
+            </span>
+            <div>
+              <h2>Installed Ollama models</h2>
+              <p>
+                {lastScanned
+                  ? `Last scanned ${lastScanned.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                  : "Scanning the local Ollama service"}
+              </p>
+            </div>
+          </div>
+          <button
+            className="secondary-button scan-models-button"
+            disabled={scanning}
+            onClick={() => void scanModels()}
+          >
+            <RefreshCw className={scanning ? "spin" : ""} size={15} />
+            {scanning ? "Scanning…" : "Scan models"}
+          </button>
+        </header>
+        <div className="settings-card-body">
+          <div className="selected-model-summary">
+            <span>Application model</span>
+            <strong>{selectedModel}</strong>
+            <small>Used by AI Focus, Ask PMO, and Gmail action matching.</small>
+          </div>
+
+          {scanError && (
+            <div className="setup-message error">
+              <CircleAlert size={16} /> {scanError}
+            </div>
+          )}
+          {!scanning && models.length > 0 && !selectedInstalled && (
+            <div className="setup-message error">
+              <CircleAlert size={16} /> The selected model is not currently
+              installed. Choose an available model below.
+            </div>
+          )}
+          {scanning && models.length === 0 ? (
+            <div className="model-scan-state">
+              <span className="loader" /> Looking for local models…
+            </div>
+          ) : models.length > 0 ? (
+            <div className="model-list">
+              {models.map((model) => (
+                <label
+                  className={`model-option ${model.name === selectedModel ? "selected" : ""}`}
+                  key={model.name}
+                >
+                  <input
+                    type="radio"
+                    name="ollama-model"
+                    value={model.name}
+                    checked={model.name === selectedModel}
+                    onChange={() => onSelect(model.name)}
+                  />
+                  <span className="model-radio">
+                    <Check size={12} />
+                  </span>
+                  <div>
+                    <strong>{model.name}</strong>
+                    <span>
+                      {[
+                        model.parameterSize,
+                        model.quantization,
+                        model.family,
+                        formatModelSize(model.size),
+                      ]
+                        .filter(Boolean)
+                        .join(" · ") || "Installed model"}
+                    </span>
+                  </div>
+                  {model.name === selectedModel && <b>In use</b>}
+                </label>
+              ))}
+            </div>
+          ) : !scanError ? (
+            <div className="model-scan-state">
+              No installed models were found.
+            </div>
+          ) : null}
+
+          <div className="verification-note model-compatibility-note">
+            Choose a chat-capable model that reliably supports structured JSON.
+            Model changes apply to new AI requests; existing saved AI Focus
+            results remain visible but are marked stale until regenerated.
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function formatModelSize(size: number | undefined): string {
+  if (!size) return "";
+  return `${(size / 1_000_000_000).toFixed(1)} GB`;
+}
+
 function GmailSetupPage({
   config,
   testing,
   status,
   error,
+  model,
   onSave,
   onTest,
   onDisconnect,
@@ -964,6 +1170,7 @@ function GmailSetupPage({
   testing: boolean;
   status: string;
   error: string;
+  model: string;
   onSave: (config: GmailConfig) => void;
   onTest: (config: GmailConfig) => void;
   onDisconnect: () => void;
@@ -1183,7 +1390,7 @@ function GmailSetupPage({
             </div>
             <div>
               <strong>AI processing</strong>
-              <span>Local Ollama qwen3.5:9b</span>
+              <span>Local Ollama {model}</span>
             </div>
           </div>
         </section>
@@ -1558,6 +1765,7 @@ function AiFocusBoard({
   error,
   generatedAt,
   stale,
+  model,
   onAnalyze,
   onSelect,
 }: {
@@ -1568,6 +1776,7 @@ function AiFocusBoard({
   error: string;
   generatedAt: Date | null;
   stale: boolean;
+  model: string;
   onAnalyze: () => void;
   onSelect: (key: string) => void;
 }) {
@@ -1587,8 +1796,8 @@ function AiFocusBoard({
         <p className="eyebrow">LOCAL AI PRIORITIZATION</p>
         <h2>Find the three actions that matter most</h2>
         <p>
-          {insightModelName} will review priority, status, and recorded updates
-          across all actions. Task data stays on this computer.
+          {model} will review priority, status, and recorded updates across all
+          actions. Task data stays on this computer.
         </p>
         <button
           className="primary-button insight-button"
@@ -1615,7 +1824,9 @@ function AiFocusBoard({
             <BrainCircuit size={14} /> AI + priority focus
           </span>
           <small>
-            Model insight · {insightModelName}
+            {stale
+              ? `Selected model · ${model} · Refresh required`
+              : `Model insight · ${model}`}
             {generatedAt
               ? ` · Generated ${generatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
               : ""}
@@ -1805,6 +2016,7 @@ function ProjectChatWindow({
   messages,
   loading,
   error,
+  model,
   onAsk,
   onClose,
   onClear,
@@ -1813,6 +2025,7 @@ function ProjectChatWindow({
   messages: ProjectChatMessage[];
   loading: boolean;
   error: string;
+  model: string;
   onAsk: (question: string) => void;
   onClose: () => void;
   onClear: () => void;
@@ -1851,7 +2064,7 @@ function ProjectChatWindow({
           </span>
           <div>
             <strong>Ask PMO</strong>
-            <span>qwen3.5:9b · Local project assistant</span>
+            <span>{model} · Local project assistant</span>
           </div>
           {messages.length > 0 && (
             <button className="chat-clear" onClick={onClear}>

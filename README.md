@@ -9,6 +9,7 @@ A local, Notion-inspired project and action management application. The supplied
 - Project navigation, search, status filters, and priority filters
 - Detailed action drawer with all properties
 - Local **Ask PMO** chat for questions about project actions, with confidence and clickable Action ID references
+- Ollama model discovery and one shared model selection for every AI feature
 - New actions, deletion, CSV import/export, and drag-and-drop status changes
 - Durable browser-local persistence with IndexedDB, a versioned local backup, and one-click restore of the original import
 - Runtime schema validation for CSV and browser-stored data
@@ -29,7 +30,7 @@ Open the local URL printed by Vite. Generate production assets with `npm run bui
 
 The imported data stays in the browser and is never sent to an external service. Every action change and update history entry is validated and written to IndexedDB, with a versioned `localStorage` backup. Existing `v1` browser data is migrated automatically without losing actions. The app also requests persistent browser storage when supported. The restore button beside the filters clears both saved copies and reloads `public/data/pmo-actions.csv`.
 
-AI Focus requests are sent only to the local Ollama service at `127.0.0.1:11434`. Start Ollama and ensure `qwen3.5:9b` is installed before generating the focus board.
+AI requests are sent only to the local Ollama service at `127.0.0.1:11434`. Open **AI model setup** to scan installed Ollama models and select the shared model used by AI Focus, Ask PMO, and Gmail action matching. `qwen3.5:9b` remains the default until another installed model is selected.
 
 ## Gmail configuration
 

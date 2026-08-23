@@ -67,6 +67,20 @@ vi.mock("./insights", () => ({
   },
 }));
 
+vi.mock("./ollama", () => ({
+  loadOllamaModel: () => "qwen3.5:9b",
+  saveOllamaModel: (model: string) => model,
+  scanInstalledOllamaModels: vi.fn(async () => [
+    {
+      name: "qwen3.5:9b",
+      size: 6_000_000_000,
+      parameterSize: "9B",
+      quantization: "Q4_K_M",
+    },
+    { name: "qwen3:4b", size: 3_000_000_000, parameterSize: "4B" },
+  ]),
+}));
+
 import App from "./App";
 
 beforeEach(() => {
@@ -115,5 +129,24 @@ describe("Gmail setup", () => {
     expect(
       screen.getByText("Unread · Primary category only"),
     ).toBeInTheDocument();
+  });
+});
+
+describe("AI model setup", () => {
+  it("scans installed models and applies one shared selection", async () => {
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: /AI model setup/i }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "AI model setup" }),
+    ).toBeInTheDocument();
+    const alternative = await screen.findByRole("radio", {
+      name: /qwen3:4b/i,
+    });
+    fireEvent.click(alternative);
+    expect(alternative).toBeChecked();
+    expect(screen.getByText(/Used by AI Focus, Ask PMO/i)).toBeInTheDocument();
   });
 });

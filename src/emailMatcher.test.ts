@@ -51,9 +51,12 @@ describe("email-to-action matching", () => {
       newAction: "",
       priority: "",
     });
-    const result = await matchEmailToAction(email, [task]);
+    const result = await matchEmailToAction(email, [task], "qwen3:4b");
     expect(result.kind).toBe("match");
     if (result.kind === "match") expect(result.taskKey).toBe("task-10");
+    expect(
+      JSON.parse(String(vi.mocked(fetch).mock.calls[0]?.[1]?.body)).model,
+    ).toBe("qwen3:4b");
   });
 
   it("creates an action for a low-confidence or invented match", async () => {

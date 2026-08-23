@@ -1309,6 +1309,133 @@
   color: #397454;
   background: #e4f1e9;
 }
+.ai-settings-heading .heading-icon {
+  color: var(--purple);
+  background: #e8e5fa;
+}
+.model-settings-card {
+  margin-top: 27px;
+}
+.scan-models-button {
+  flex: 0 0 auto;
+}
+.selected-model-summary {
+  padding: 14px 15px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4px 12px;
+  border: 1px solid #ddd7f2;
+  border-radius: 10px;
+  background: #f8f6ff;
+}
+.selected-model-summary > span {
+  grid-row: span 2;
+  padding: 5px 8px;
+  color: #6758c9;
+  border-radius: 7px;
+  background: #e9e5ff;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.selected-model-summary strong {
+  color: #3f3850;
+  font-size: 13px;
+}
+.selected-model-summary small {
+  color: #8a8491;
+  font-size: 8px;
+}
+.model-list {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+.model-option {
+  min-height: 70px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 23px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #e2dfe6;
+  border-radius: 9px;
+  background: white;
+  cursor: pointer;
+}
+.model-option:hover {
+  border-color: #c9c1ed;
+  background: #fbfaff;
+}
+.model-option.selected {
+  border-color: #a99ee5;
+  background: #f7f5ff;
+  box-shadow: 0 0 0 2px #6b58d10d;
+}
+.model-option > input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.model-radio {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  border: 1px solid #cec9d5;
+  border-radius: 50%;
+  background: white;
+}
+.model-option.selected .model-radio {
+  color: white;
+  border-color: var(--purple);
+  background: var(--purple);
+}
+.model-option div strong,
+.model-option div span {
+  overflow: hidden;
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.model-option div strong {
+  margin-bottom: 5px;
+  color: #48414f;
+  font-size: 11px;
+}
+.model-option div span {
+  color: #928c97;
+  font-size: 8px;
+}
+.model-option > b {
+  padding: 4px 6px;
+  color: #397454;
+  border-radius: 9px;
+  background: #e3f1e8;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.model-scan-state {
+  min-height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #837d89;
+  font-size: 10px;
+}
+.model-scan-state .loader {
+  width: 14px;
+  height: 14px;
+}
+.model-compatibility-note {
+  margin-top: 16px;
+}
 .gmail-setup-grid {
   margin-top: 27px;
   display: grid;
@@ -1931,6 +2058,12 @@
     width: auto;
     padding: 7px 12px;
     font-size: 10px;
+  }
+  .model-list {
+    grid-template-columns: 1fr;
+  }
+  .model-settings-card > header {
+    flex-direction: column;
   }
   .settings-card > header {
     align-items: flex-start;

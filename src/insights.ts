@@ -1,7 +1,6 @@
 import { z } from "zod";
+import { DEFAULT_OLLAMA_MODEL, OllamaModelNameSchema } from "./ollama";
 import type { Task } from "./types";
-
-const MODEL = "qwen3.5:9b";
 
 const OllamaResponseSchema = z.object({
   model: z.string(),
@@ -119,7 +118,9 @@ const outputFormat = {
 
 export async function generateProjectInsights(
   tasks: Task[],
+  model = DEFAULT_OLLAMA_MODEL,
 ): Promise<AiInsightResult> {
+  const validatedModel = OllamaModelNameSchema.parse(model);
   const scopedTasks = tasks.map((task) => ({
     id: task.ID,
     action: task.Action,
@@ -135,7 +136,7 @@ export async function generateProjectInsights(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: MODEL,
+      model: validatedModel,
       stream: false,
       think: false,
       format: outputFormat,
@@ -275,5 +276,3 @@ function priorityScore(task: Task): number {
   if (/complete|completed|done|closed/i.test(task.Status)) score -= 10;
   return score;
 }
-
-export const insightModelName = MODEL;

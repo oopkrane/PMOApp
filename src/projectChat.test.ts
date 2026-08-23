@@ -39,8 +39,16 @@ describe("project action assistant", () => {
         ),
       ),
     );
-    const answer = await askProjectActions("What needs attention?", [task], []);
+    const answer = await askProjectActions(
+      "What needs attention?",
+      [task],
+      [],
+      "qwen3:4b",
+    );
     expect(answer.references[0]?.taskKey).toBe("task-42");
+    expect(
+      JSON.parse(String(vi.mocked(fetch).mock.calls[0]?.[1]?.body)).model,
+    ).toBe("qwen3:4b");
   });
 
   it("removes invented action references", async () => {
