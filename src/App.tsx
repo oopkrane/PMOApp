@@ -415,7 +415,7 @@ function App() {
           workingTasks = workingTasks.map((task) =>
             task._key === decision.taskKey
               ? applyTaskUpdate(
-                  task,
+                  { ...task, "Email Subject": email.subject },
                   `Email: ${decision.update}`,
                   email.receivedAt,
                 )

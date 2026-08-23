@@ -76,4 +76,79 @@ describe("email-to-action matching", () => {
       }),
     );
   });
+
+  it("keeps a reply on the uniquely matching stored email thread", async () => {
+    mockModel({
+      actionId: "",
+      confidence: 0.35,
+      update: "The checklist owner confirmed completion.",
+      reason: "The model was uncertain.",
+      newAction: "Confirm checklist completion",
+      priority: "",
+    });
+    const result = await matchEmailToAction(
+      { ...email, subject: "Re: Project A launch checklist" },
+      [{ ...task, "Email Subject": "FW: Project A launch checklist" }],
+    );
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        kind: "match",
+        taskKey: "task-10",
+        confidence: 0.95,
+      }),
+    );
+  });
+
+  it("sends likely candidates first with subject and history evidence", async () => {
+    const unrelated = {
+      ...task,
+      _key: "task-11",
+      ID: "11",
+      Action: "Renew support contract",
+      "Email Subject": "Project A annual support renewal",
+    };
+    mockModel({
+      actionId: "10",
+      confidence: 0.9,
+      update: "The launch checklist was confirmed complete.",
+      reason: "Same launch deliverable.",
+      newAction: "",
+      priority: "",
+    });
+
+    await matchEmailToAction(email, [unrelated, task]);
+
+    const request = JSON.parse(
+      String(vi.mocked(fetch).mock.calls[0]?.[1]?.body),
+    );
+    const candidateText = request.messages[1].content.split(
+      "Candidate actions:\n",
+    )[1];
+    const candidates = JSON.parse(candidateText);
+    expect(candidates[0].id).toBe("10");
+    expect(candidates[0]).toEqual(
+      expect.objectContaining({ emailSubject: "", recentHistory: "" }),
+    );
+  });
+
+  it("does not create a duplicate thread when model output is invalid", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ message: { content: "not json" } }), {
+          status: 200,
+        }),
+      ),
+    );
+
+    const result = await matchEmailToAction(
+      { ...email, subject: "Re: Project A launch checklist" },
+      [{ ...task, "Email Subject": "Project A launch checklist" }],
+    );
+
+    expect(result).toEqual(
+      expect.objectContaining({ kind: "match", taskKey: "task-10" }),
+    );
+  });
 });
