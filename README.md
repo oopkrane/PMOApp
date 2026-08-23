@@ -8,6 +8,7 @@ A local, Notion-inspired project and action management application. The supplied
 - Kanban board grouped by imported Status values
 - Project navigation, search, status filters, and priority filters
 - Detailed action drawer with all properties
+- Local **Ask PMO** chat for questions about project actions, with confidence and clickable Action ID references
 - New actions, deletion, CSV import/export, and drag-and-drop status changes
 - Browser-local persistence with one-click restore of the original import
 - Runtime schema validation for CSV and browser-stored data
@@ -31,7 +32,7 @@ AI Focus requests are sent only to the local Ollama service at `127.0.0.1:11434`
 
 ## Gmail configuration
 
-The Gmail integration uses Google Identity Services and the official Gmail API. It requests `gmail.modify` only when **Process Gmail** is selected. A valid short-lived access token is reused in browser memory, and subsequent token requests do not force consent after the first grant. Tokens are never written to browser storage or disk; only a non-sensitive previous-authorization flag is retained. Email content is sent only to local Ollama.
+The Gmail integration uses Google Identity Services and the official Gmail API. It requests `gmail.modify` only when **Process Gmail** is selected. A valid short-lived access token is reused in browser memory, and subsequent token requests do not force consent after the first grant. Tokens are never written to browser storage or disk. Email content is sent only to local Ollama.
 
 1. Create or select a Google Cloud project and enable the Gmail API.
 2. Configure the Google Auth consent screen for testing and add `oopkrane@gmail.com` as a test user.

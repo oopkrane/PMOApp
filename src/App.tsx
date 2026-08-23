@@ -50,6 +50,12 @@ import {
 } from "./insights";
 import { loadWorkspaceView, saveWorkspaceView } from "./preferences";
 import {
+  askProjectActions,
+  type ProjectChatAnswer,
+  type ProjectChatHistoryItem,
+  type ProjectChatReference,
+} from "./projectChat";
+import {
   COLUMN_NAMES,
   DISPLAY_COLUMNS,
   columnLabel,
@@ -61,6 +67,14 @@ import "./App.css";
 
 const completionPattern = /^(complete|completed|done|closed)$/i;
 const GMAIL_ACCOUNT = "oopkrane@gmail.com";
+
+interface ProjectChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  confidence?: ProjectChatAnswer["confidence"];
+  references?: ProjectChatReference[];
+}
 
 function uniqueValues(tasks: Task[], column: ColumnName): string[] {
   return [
@@ -135,6 +149,10 @@ function App() {
   const [gmailProcessing, setGmailProcessing] = useState(false);
   const [gmailStatus, setGmailStatus] = useState("");
   const [gmailError, setGmailError] = useState("");
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ProjectChatMessage[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -407,6 +425,41 @@ function App() {
     }
   }
 
+  async function askPmo(question: string) {
+    const history: ProjectChatHistoryItem[] = chatMessages
+      .slice(-10)
+      .map(({ role, content }) => ({ role, content }));
+    const userMessage: ProjectChatMessage = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: question.trim(),
+    };
+    setChatMessages((current) => [...current, userMessage]);
+    setChatLoading(true);
+    setChatError("");
+    try {
+      const answer = await askProjectActions(question, tasks, history);
+      setChatMessages((current) => [
+        ...current,
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: answer.answer,
+          confidence: answer.confidence,
+          references: answer.references,
+        },
+      ]);
+    } catch (reason) {
+      setChatError(
+        reason instanceof Error
+          ? reason.message
+          : "The local PMO assistant could not answer that question.",
+      );
+    } finally {
+      setChatLoading(false);
+    }
+  }
+
   if (loading)
     return (
       <div className="state-page">
@@ -508,6 +561,12 @@ function App() {
             </strong>
           </div>
           <div className="top-actions">
+            <button
+              className="secondary-button"
+              onClick={() => setChatOpen(true)}
+            >
+              <BrainCircuit size={16} /> Ask PMO
+            </button>
             <button
               className="secondary-button gmail-button"
               disabled={gmailProcessing}
@@ -700,6 +759,23 @@ function App() {
           onClose={() => setSelectedKey(null)}
           onUpdate={updateTask}
           onDelete={deleteTask}
+        />
+      )}
+      {chatOpen && (
+        <ProjectChatWindow
+          messages={chatMessages}
+          loading={chatLoading}
+          error={chatError}
+          onAsk={(question) => void askPmo(question)}
+          onClose={() => setChatOpen(false)}
+          onClear={() => {
+            setChatMessages([]);
+            setChatError("");
+          }}
+          onSelectReference={(key) => {
+            setChatOpen(false);
+            setSelectedKey(key);
+          }}
         />
       )}
       <datalist id="owner-options">
@@ -1334,6 +1410,166 @@ function TaskDrawer({
           <span>Changes save automatically</span>
         </footer>
       </aside>
+    </div>
+  );
+}
+
+function ProjectChatWindow({
+  messages,
+  loading,
+  error,
+  onAsk,
+  onClose,
+  onClear,
+  onSelectReference,
+}: {
+  messages: ProjectChatMessage[];
+  loading: boolean;
+  error: string;
+  onAsk: (question: string) => void;
+  onClose: () => void;
+  onClear: () => void;
+  onSelectReference: (key: string) => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const messageEndRef = useRef<HTMLDivElement>(null);
+  const suggestions = [
+    "Which high-priority actions need attention?",
+    "Summarize progress by project.",
+    "Which actions have no owner?",
+  ];
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [loading, messages]);
+
+  function submit(question: string) {
+    const trimmed = question.trim();
+    if (!trimmed || loading) return;
+    onAsk(trimmed);
+    setDraft("");
+  }
+
+  return (
+    <div
+      className="chat-backdrop"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section className="chat-window" aria-label="Ask PMO assistant">
+        <header className="chat-header">
+          <span className="chat-model-icon">
+            <BrainCircuit size={20} />
+          </span>
+          <div>
+            <strong>Ask PMO</strong>
+            <span>qwen3.5:9b · Local project assistant</span>
+          </div>
+          {messages.length > 0 && (
+            <button className="chat-clear" onClick={onClear}>
+              Clear
+            </button>
+          )}
+          <button className="icon-button" aria-label="Close" onClick={onClose}>
+            <X size={19} />
+          </button>
+        </header>
+        <div className="chat-messages" aria-live="polite">
+          {messages.length === 0 ? (
+            <div className="chat-empty">
+              <BrainCircuit size={30} />
+              <h2>Ask about your project actions</h2>
+              <p>
+                Answers use the current action table and link back to referenced
+                Action IDs. Data stays on this computer.
+              </p>
+              <div className="chat-suggestions">
+                {suggestions.map((suggestion) => (
+                  <button key={suggestion} onClick={() => submit(suggestion)}>
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            messages.map((message) => (
+              <article
+                className={`chat-message ${message.role}`}
+                key={message.id}
+              >
+                <div className="chat-message-meta">
+                  <strong>{message.role === "user" ? "You" : "PMO AI"}</strong>
+                  {message.confidence && (
+                    <span className={`confidence ${message.confidence}`}>
+                      {message.confidence} confidence
+                    </span>
+                  )}
+                </div>
+                <p>{message.content}</p>
+                {message.references && message.references.length > 0 && (
+                  <div className="chat-references">
+                    <span>Referenced actions</span>
+                    {message.references.map((reference) => (
+                      <button
+                        key={reference.taskKey}
+                        title={reference.relevance}
+                        onClick={() => onSelectReference(reference.taskKey)}
+                      >
+                        #{reference.actionId}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </article>
+            ))
+          )}
+          {loading && (
+            <div className="chat-thinking">
+              <span className="loader" /> Reviewing project actions…
+            </div>
+          )}
+          {error && (
+            <div className="chat-error">
+              <CircleAlert size={16} /> {error}
+            </div>
+          )}
+          <div ref={messageEndRef} />
+        </div>
+        <form
+          className="chat-composer"
+          onSubmit={(event) => {
+            event.preventDefault();
+            submit(draft);
+          }}
+        >
+          <textarea
+            value={draft}
+            maxLength={2000}
+            placeholder="Ask about priorities, owners, status, updates…"
+            aria-label="Question about project actions"
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                submit(draft);
+              }
+            }}
+          />
+          <button
+            className="primary-button"
+            disabled={loading || !draft.trim()}
+          >
+            {loading ? (
+              <RefreshCw className="spin" size={16} />
+            ) : (
+              <Sparkles size={16} />
+            )}
+            Ask
+          </button>
+          <small>Enter to send · Shift+Enter for a new line</small>
+        </form>
+      </section>
     </div>
   );
 }

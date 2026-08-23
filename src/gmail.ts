@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const GMAIL_API = "https://gmail.googleapis.com/gmail/v1/users/me";
 const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.modify";
+let cachedToken: { accessToken: string; expiresAt: number } | null = null;
 
 const ProfileSchema = z.object({ emailAddress: z.string().email() });
 const MessageListSchema = z.object({
@@ -45,6 +46,10 @@ export async function authorizeGmail(
   clientId: string,
   expectedEmail: string,
 ): Promise<string> {
+  if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
+    return cachedToken.accessToken;
+  }
+
   const google = await waitForGoogleIdentity();
   return new Promise((resolve, reject) => {
     const client = google.accounts.oauth2.initTokenClient({
@@ -62,13 +67,22 @@ export async function authorizeGmail(
           );
           return;
         }
+        const lifetimeSeconds = Number(response.expires_in ?? 3600);
+        cachedToken = {
+          accessToken: response.access_token,
+          expiresAt: Date.now() + lifetimeSeconds * 1000,
+        };
         resolve(response.access_token);
       },
       error_callback: () =>
         reject(new Error("Google authorization was closed or blocked.")),
     });
-    client.requestAccessToken({ prompt: "consent" });
+    client.requestAccessToken({ prompt: "" });
   });
+}
+
+export function clearCachedGmailToken(): void {
+  cachedToken = null;
 }
 
 export async function confirmGmailAccount(
@@ -84,6 +98,7 @@ export async function confirmGmailAccount(
     profile.emailAddress.toLocaleLowerCase() !==
     expectedEmail.toLocaleLowerCase()
   ) {
+    clearCachedGmailToken();
     window.google?.accounts.oauth2.revoke(accessToken);
     throw new Error(`Please authorize the ${expectedEmail} Gmail account.`);
   }
@@ -168,6 +183,7 @@ export async function markEmailRead(
       body: JSON.stringify({ removeLabelIds: ["UNREAD"] }),
     },
   );
+  if (response.status === 401) clearCachedGmailToken();
   if (!response.ok)
     throw new Error(
       `Gmail could not mark a processed email as read (${response.status}).`,
@@ -183,6 +199,7 @@ async function gmailFetch<T>(
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!response.ok) {
+    if (response.status === 401) clearCachedGmailToken();
     throw new Error(
       response.status === 401
         ? "Google authorization expired. Select Process Gmail again."

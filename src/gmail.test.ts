@@ -1,11 +1,54 @@
 // @vitest-environment jsdom
 
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { confirmGmailAccount, findUnreadProjectEmails } from "./gmail";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  authorizeGmail,
+  clearCachedGmailToken,
+  confirmGmailAccount,
+  findUnreadProjectEmails,
+} from "./gmail";
+
+beforeEach(() => {
+  clearCachedGmailToken();
+  window.localStorage.clear();
+});
 
 afterEach(() => vi.restoreAllMocks());
 
 describe("Gmail data boundary", () => {
+  it("reuses a valid token without forcing repeated consent", async () => {
+    const prompts: Array<string | undefined> = [];
+    const initTokenClient = vi.fn(
+      (config: { callback(response: GoogleTokenResponse): void }) => ({
+        requestAccessToken: (options?: { prompt?: string }) => {
+          prompts.push(options?.prompt);
+          config.callback({
+            access_token: `token-${prompts.length}`,
+            expires_in: 3600,
+          });
+        },
+      }),
+    );
+    window.google = {
+      accounts: {
+        oauth2: {
+          initTokenClient,
+          revoke: vi.fn(),
+        },
+      },
+    };
+
+    const first = await authorizeGmail("client-id", "oopkrane@gmail.com");
+    const reused = await authorizeGmail("client-id", "oopkrane@gmail.com");
+    expect(first).toBe(reused);
+    expect(initTokenClient).toHaveBeenCalledTimes(1);
+    expect(prompts).toEqual([""]);
+
+    clearCachedGmailToken();
+    await authorizeGmail("client-id", "oopkrane@gmail.com");
+    expect(prompts).toEqual(["", ""]);
+  });
+
   it("confirms the authorized mailbox identity", async () => {
     vi.stubGlobal(
       "fetch",
