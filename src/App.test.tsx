@@ -46,11 +46,12 @@ const result: AiInsightResult = {
 };
 
 vi.mock("./data", () => ({
-  clearSavedTasks: vi.fn(),
+  clearSavedTasks: vi.fn(async () => undefined),
   exportCsv: vi.fn(() => ""),
   loadSeedTasks: vi.fn(async () => tasks),
   parseCsv: vi.fn(),
-  saveTasks: vi.fn(),
+  requestPersistentTaskStorage: vi.fn(async () => true),
+  saveTasks: vi.fn(async () => undefined),
 }));
 
 vi.mock("./insights", () => ({
@@ -91,6 +92,28 @@ describe("AI Focus view persistence", () => {
     expect(await screen.findByText("Top 3 actions")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Refresh insights/i }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("Gmail setup", () => {
+  it("opens the configuration page from the sidebar", async () => {
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: /Gmail setup/i }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Gmail setup" }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Gmail account")).toHaveValue(
+      "oopkrane@gmail.com",
+    );
+    expect(
+      screen.getByRole("button", { name: /Test connection/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Unread · Primary category only"),
     ).toBeInTheDocument();
   });
 });

@@ -1302,6 +1302,222 @@
 .danger-button:hover {
   background: #fdebed;
 }
+.gmail-setup-page {
+  max-width: 1180px;
+}
+.gmail-heading .heading-icon {
+  color: #397454;
+  background: #e4f1e9;
+}
+.gmail-setup-grid {
+  margin-top: 27px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(330px, 0.75fr);
+  gap: 14px;
+  align-items: start;
+}
+.settings-card {
+  overflow: hidden;
+  border: 1px solid #e4e1e8;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 5px 18px #2b23360a;
+}
+.settings-card > header {
+  min-height: 70px;
+  padding: 14px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #eeebf0;
+  background: #fdfcfe;
+}
+.settings-card > header > div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.settings-step {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--purple);
+  border-radius: 8px;
+  background: #eeebff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.settings-card h2 {
+  margin: 0 0 3px;
+  color: #3a3540;
+  font: 700 13px/1.3 "Manrope";
+}
+.settings-card header p {
+  margin: 0;
+  color: #8d8793;
+  font-size: 9px;
+}
+.settings-card header > a {
+  color: var(--purple);
+  font-size: 9px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.settings-card header > a:hover {
+  text-decoration: underline;
+}
+.local-badge {
+  padding: 4px 7px;
+  color: #397454;
+  border-radius: 10px;
+  background: #e5f2ea;
+  font-size: 8px;
+  font-weight: 700;
+}
+.settings-card-body {
+  padding: 18px;
+}
+.gmail-config-card {
+  grid-row: span 2;
+}
+.settings-field {
+  margin-bottom: 16px;
+  display: block;
+}
+.settings-field > span {
+  margin-bottom: 6px;
+  display: block;
+  color: #534d59;
+  font-size: 10px;
+  font-weight: 700;
+}
+.settings-field input {
+  width: 100%;
+  min-height: 39px;
+  padding: 9px 11px;
+  color: #3d3743;
+  border: 1px solid #dcd8e1;
+  border-radius: 8px;
+  outline: none;
+  font: inherit;
+  font-size: 10px;
+}
+.settings-field input:focus {
+  border-color: #a99ee5;
+  box-shadow: 0 0 0 3px #6a55d313;
+}
+.settings-field small {
+  margin-top: 5px;
+  display: block;
+  color: #98929e;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.settings-actions {
+  margin-top: 17px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.setup-message {
+  margin-top: 10px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  font-size: 9px;
+}
+.setup-message.error {
+  color: #a34850;
+  border: 1px solid #efcdd1;
+  background: #fff2f3;
+}
+.setup-message.success {
+  color: #397454;
+  border: 1px solid #d0e4d7;
+  background: #f0f8f3;
+}
+.setup-checklist {
+  display: grid;
+  gap: 12px;
+}
+.setup-checklist > div:not(.verification-note) {
+  display: grid;
+  grid-template-columns: 23px 1fr;
+  align-items: start;
+  gap: 8px;
+}
+.setup-checklist > div > span {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  color: #397454;
+  border-radius: 7px;
+  background: #e8f3ec;
+}
+.setup-checklist p,
+.privacy-copy {
+  margin: 2px 0 0;
+  color: #6f6976;
+  font-size: 9px;
+  line-height: 1.6;
+}
+.setup-checklist strong {
+  color: #48424e;
+}
+.origin-value {
+  overflow-x: auto;
+  margin-left: 31px;
+  padding: 9px 10px;
+  color: #514675;
+  border: 1px solid #ddd6f4;
+  border-radius: 7px;
+  background: #f7f5ff;
+  font-size: 9px;
+  white-space: nowrap;
+}
+.verification-note {
+  padding: 10px 11px;
+  color: #806336;
+  border: 1px solid #eadfc8;
+  border-radius: 8px;
+  background: #fffaf0;
+  font-size: 8px;
+  line-height: 1.55;
+}
+.rules-list {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.rules-list > div {
+  padding: 9px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid #f0edf2;
+  font-size: 9px;
+}
+.rules-list > div:last-child {
+  border-bottom: 0;
+}
+.rules-list strong {
+  color: #514b57;
+}
+.rules-list span {
+  color: #85808b;
+  text-align: right;
+}
+.session-card .danger-button,
+.session-card .text-button {
+  min-height: 32px;
+  font-size: 9px;
+}
 .chat-backdrop {
   position: fixed;
   z-index: 90;
@@ -1659,6 +1875,12 @@
 }
 
 @media (max-width: 1000px) {
+  .gmail-setup-grid {
+    grid-template-columns: 1fr;
+  }
+  .gmail-config-card {
+    grid-row: auto;
+  }
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1704,6 +1926,21 @@
     width: 34px;
     padding: 0;
     font-size: 0;
+  }
+  .gmail-setup-page .secondary-button {
+    width: auto;
+    padding: 7px 12px;
+    font-size: 10px;
+  }
+  .settings-card > header {
+    align-items: flex-start;
+  }
+  .settings-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .settings-actions button {
+    width: 100%;
   }
   .page-content {
     padding: 24px 14px 45px;

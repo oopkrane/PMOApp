@@ -85,6 +85,15 @@ export function clearCachedGmailToken(): void {
   cachedToken = null;
 }
 
+export async function disconnectGmail(): Promise<void> {
+  const accessToken = cachedToken?.accessToken;
+  cachedToken = null;
+  if (!accessToken || !window.google) return;
+  await new Promise<void>((resolve) => {
+    window.google?.accounts.oauth2.revoke(accessToken, resolve);
+  });
+}
+
 export async function confirmGmailAccount(
   accessToken: string,
   expectedEmail: string,

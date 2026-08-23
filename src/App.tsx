@@ -31,16 +31,25 @@ import {
   exportCsv,
   loadSeedTasks,
   parseCsv,
+  requestPersistentTaskStorage,
   saveTasks,
 } from "./data";
 import { nextSequentialId } from "./ids";
 import { matchEmailToAction } from "./emailMatcher";
 import {
   authorizeGmail,
+  disconnectGmail,
   confirmGmailAccount,
   findUnreadProjectEmails,
   markEmailRead,
 } from "./gmail";
+import {
+  GmailConfigSchema,
+  clearGmailConfig,
+  loadGmailConfig,
+  saveGmailConfig,
+  type GmailConfig,
+} from "./gmailConfig";
 import {
   generateProjectInsights,
   insightModelName,
@@ -66,7 +75,6 @@ import { applyTaskUpdate } from "./updates";
 import "./App.css";
 
 const completionPattern = /^(complete|completed|done|closed)$/i;
-const GMAIL_ACCOUNT = "oopkrane@gmail.com";
 
 interface ProjectChatMessage {
   id: string;
@@ -124,6 +132,10 @@ function blankTask(id: string, key: string): Task {
 
 function App() {
   const [initialInsights] = useState(loadSavedInsights);
+  const [page, setPage] = useState<"workspace" | "gmail-setup">("workspace");
+  const [gmailConfig, setGmailConfig] = useState(() =>
+    loadGmailConfig(import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim()),
+  );
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -149,6 +161,8 @@ function App() {
   const [gmailProcessing, setGmailProcessing] = useState(false);
   const [gmailStatus, setGmailStatus] = useState("");
   const [gmailError, setGmailError] = useState("");
+  const [gmailConnectionStatus, setGmailConnectionStatus] = useState("");
+  const [gmailTesting, setGmailTesting] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ProjectChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
@@ -157,7 +171,10 @@ function App() {
 
   useEffect(() => {
     loadSeedTasks()
-      .then(setTasks)
+      .then((loadedTasks) => {
+        setTasks(loadedTasks);
+        void requestPersistentTaskStorage();
+      })
       .catch((reason: unknown) =>
         setError(
           reason instanceof Error ? reason.message : "Unable to load tasks.",
@@ -167,7 +184,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!loading && tasks.length > 0) saveTasks(tasks);
+    if (!loading) {
+      void saveTasks(tasks).catch(() =>
+        setError(
+          "Actions could not be written to durable browser storage. Export a CSV backup before closing the app.",
+        ),
+      );
+    }
   }, [tasks, loading]);
 
   useEffect(() => {
@@ -292,7 +315,7 @@ function App() {
   }
 
   async function restoreImport() {
-    clearSavedTasks();
+    await clearSavedTasks();
     setLoading(true);
     try {
       markInsightsStale();
@@ -333,20 +356,23 @@ function App() {
   }
 
   async function processGmail() {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
-    if (!clientId) {
+    if (!gmailConfig.clientId) {
       setGmailError(
-        "Google OAuth is not configured. Add VITE_GOOGLE_CLIENT_ID to a local .env file.",
+        "Google OAuth is not configured. Open Gmail setup and add your client ID.",
       );
+      setPage("gmail-setup");
       return;
     }
 
     setGmailProcessing(true);
     setGmailError("");
-    setGmailStatus(`Connecting to ${GMAIL_ACCOUNT}…`);
+    setGmailStatus(`Connecting to ${gmailConfig.accountEmail}…`);
     try {
-      const accessToken = await authorizeGmail(clientId, GMAIL_ACCOUNT);
-      await confirmGmailAccount(accessToken, GMAIL_ACCOUNT);
+      const accessToken = await authorizeGmail(
+        gmailConfig.clientId,
+        gmailConfig.accountEmail,
+      );
+      await confirmGmailAccount(accessToken, gmailConfig.accountEmail);
       setGmailStatus(
         "Finding unread Primary emails with project names in the subject…",
       );
@@ -425,6 +451,56 @@ function App() {
     }
   }
 
+  function updateGmailConfig(config: GmailConfig) {
+    const saved = saveGmailConfig(config);
+    setGmailConfig(saved);
+    setGmailConnectionStatus("Configuration saved on this computer.");
+    setGmailError("");
+  }
+
+  async function testGmailConnection(config: GmailConfig) {
+    setGmailTesting(true);
+    setGmailConnectionStatus("");
+    setGmailError("");
+    try {
+      const validated = GmailConfigSchema.parse(config);
+      const accessToken = await authorizeGmail(
+        validated.clientId,
+        validated.accountEmail,
+      );
+      await confirmGmailAccount(accessToken, validated.accountEmail);
+      updateGmailConfig(validated);
+      setGmailConnectionStatus(
+        `Connected successfully to ${validated.accountEmail}.`,
+      );
+    } catch (reason) {
+      setGmailError(
+        reason instanceof Error
+          ? reason.message
+          : "The Gmail connection test failed.",
+      );
+    } finally {
+      setGmailTesting(false);
+    }
+  }
+
+  async function disconnectConfiguredGmail() {
+    await disconnectGmail();
+    setGmailConnectionStatus("The local Gmail session was disconnected.");
+    setGmailStatus("");
+    setGmailError("");
+  }
+
+  function resetGmailConfig() {
+    clearGmailConfig();
+    const defaults = loadGmailConfig(
+      import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim(),
+    );
+    setGmailConfig(defaults);
+    setGmailConnectionStatus("Saved Gmail settings were reset.");
+    setGmailError("");
+  }
+
   async function askPmo(question: string) {
     const history: ProjectChatHistoryItem[] = chatMessages
       .slice(-10)
@@ -487,7 +563,10 @@ function App() {
           <ChevronDown size={15} />
         </div>
         <nav className="primary-nav" aria-label="Workspace navigation">
-          <button className="nav-item active">
+          <button
+            className={`nav-item ${page === "workspace" ? "active" : ""}`}
+            onClick={() => setPage("workspace")}
+          >
             <LayoutDashboard size={17} /> Overview
           </button>
           <button className="nav-item">
@@ -505,7 +584,10 @@ function App() {
           </div>
           <button
             className={`project-link ${projectFilter === "All projects" ? "selected" : ""}`}
-            onClick={() => setProjectFilter("All projects")}
+            onClick={() => {
+              setPage("workspace");
+              setProjectFilter("All projects");
+            }}
           >
             <span className="project-icon all">
               <FolderKanban size={14} />
@@ -517,7 +599,10 @@ function App() {
             <button
               className={`project-link ${projectFilter === project ? "selected" : ""}`}
               key={project}
-              onClick={() => setProjectFilter(project)}
+              onClick={() => {
+                setPage("workspace");
+                setProjectFilter(project);
+              }}
             >
               <span className={`project-icon color-${index % 5}`}>
                 {project.slice(0, 1).toUpperCase()}
@@ -528,8 +613,11 @@ function App() {
           ))}
         </div>
         <div className="sidebar-footer">
-          <button className="nav-item">
-            <Settings size={17} /> Settings
+          <button
+            className={`nav-item ${page === "gmail-setup" ? "active" : ""}`}
+            onClick={() => setPage("gmail-setup")}
+          >
+            <Settings size={17} /> Gmail setup
           </button>
           <div className="profile">
             <div className="avatar">PM</div>
@@ -555,201 +643,228 @@ function App() {
             <span>Workspace</span>
             <b>/</b>
             <strong>
-              {projectFilter === "All projects"
-                ? "Action tracker"
-                : projectFilter}
-            </strong>
-          </div>
-          <div className="top-actions">
-            <button
-              className="secondary-button"
-              onClick={() => setChatOpen(true)}
-            >
-              <BrainCircuit size={16} /> Ask PMO
-            </button>
-            <button
-              className="secondary-button gmail-button"
-              disabled={gmailProcessing}
-              onClick={() => void processGmail()}
-            >
-              {gmailProcessing ? (
-                <RefreshCw className="spin" size={16} />
-              ) : (
-                <MailCheck size={16} />
-              )}
-              {gmailProcessing ? "Processing…" : "Process Gmail"}
-            </button>
-            <button
-              className="secondary-button"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload size={16} /> Import
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,text/csv"
-              hidden
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) void importFile(file);
-                event.currentTarget.value = "";
-              }}
-            />
-            <button className="secondary-button" onClick={downloadCsv}>
-              <ArrowDownToLine size={16} /> Export
-            </button>
-            <button className="primary-button" onClick={addTask}>
-              <Plus size={17} /> New action
-            </button>
-          </div>
-        </header>
-
-        <div className="page-content">
-          <section className="page-heading">
-            <div className="heading-icon">
-              <Sparkles size={23} />
-            </div>
-            <div>
-              <p className="eyebrow">PMO CONTROL CENTRE</p>
-              <h1>
-                {projectFilter === "All projects"
+              {page === "gmail-setup"
+                ? "Gmail setup"
+                : projectFilter === "All projects"
                   ? "Action tracker"
                   : projectFilter}
-              </h1>
-              <p>Plan, track and move every project action forward.</p>
+            </strong>
+          </div>
+          {page === "workspace" ? (
+            <div className="top-actions">
+              <button
+                className="secondary-button"
+                onClick={() => setChatOpen(true)}
+              >
+                <BrainCircuit size={16} /> Ask PMO
+              </button>
+              <button
+                className="secondary-button gmail-button"
+                disabled={gmailProcessing}
+                onClick={() => void processGmail()}
+              >
+                {gmailProcessing ? (
+                  <RefreshCw className="spin" size={16} />
+                ) : (
+                  <MailCheck size={16} />
+                )}
+                {gmailProcessing ? "Processing…" : "Process Gmail"}
+              </button>
+              <button
+                className="secondary-button"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload size={16} /> Import
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,text/csv"
+                hidden
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void importFile(file);
+                  event.currentTarget.value = "";
+                }}
+              />
+              <button className="secondary-button" onClick={downloadCsv}>
+                <ArrowDownToLine size={16} /> Export
+              </button>
+              <button className="primary-button" onClick={addTask}>
+                <Plus size={17} /> New action
+              </button>
             </div>
-          </section>
-          <section className="stats-grid" aria-label="Workspace statistics">
-            <StatCard
-              label="Total actions"
-              value={tasks.length}
-              note={`${filteredTasks.length} in current view`}
-              icon={<Columns3 size={18} />}
-              tone="purple"
-            />
-            <StatCard
-              label="Completed"
-              value={completed}
-              note={`${tasks.length ? Math.round((completed / tasks.length) * 100) : 0}% completion rate`}
-              icon={<CircleCheckBig size={18} />}
-              tone="green"
-            />
-            <StatCard
-              label="High priority"
-              value={highPriority}
-              note="Needs focus"
-              icon={<CircleAlert size={18} />}
-              tone="orange"
-            />
-            <StatCard
-              label="Unassigned"
-              value={unassigned}
-              note={`${projects.length} active projects`}
-              icon={<Users size={18} />}
-              tone="blue"
-            />
-          </section>
-          <section className="workspace-card">
-            <div className="view-toolbar">
-              <div className="view-tabs">
-                <button
-                  className={view === "table" ? "active" : ""}
-                  onClick={() => setView("table")}
-                >
-                  <Table2 size={16} /> Table
-                </button>
-                <button
-                  className={view === "board" ? "active" : ""}
-                  onClick={() => setView("board")}
-                >
-                  <Columns3 size={16} /> Board
-                </button>
-                <button
-                  className={view === "insights" ? "active" : ""}
-                  onClick={() => setView("insights")}
-                >
-                  <BrainCircuit size={16} /> AI Focus
-                </button>
+          ) : (
+            <div className="top-actions">
+              <button
+                className="secondary-button"
+                onClick={() => setPage("workspace")}
+              >
+                <LayoutDashboard size={16} /> Back to actions
+              </button>
+            </div>
+          )}
+        </header>
+
+        {page === "gmail-setup" ? (
+          <GmailSetupPage
+            key={`${gmailConfig.accountEmail}:${gmailConfig.clientId}`}
+            config={gmailConfig}
+            testing={gmailTesting}
+            status={gmailConnectionStatus}
+            error={gmailError}
+            onSave={updateGmailConfig}
+            onTest={(config) => void testGmailConnection(config)}
+            onDisconnect={() => void disconnectConfiguredGmail()}
+            onReset={resetGmailConfig}
+          />
+        ) : (
+          <div className="page-content">
+            <section className="page-heading">
+              <div className="heading-icon">
+                <Sparkles size={23} />
               </div>
-              <div className="toolbar-actions">
-                <label className="search-box">
-                  <Search size={16} />
-                  <input
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search actions…"
+              <div>
+                <p className="eyebrow">PMO CONTROL CENTRE</p>
+                <h1>
+                  {projectFilter === "All projects"
+                    ? "Action tracker"
+                    : projectFilter}
+                </h1>
+                <p>Plan, track and move every project action forward.</p>
+              </div>
+            </section>
+            <section className="stats-grid" aria-label="Workspace statistics">
+              <StatCard
+                label="Total actions"
+                value={tasks.length}
+                note={`${filteredTasks.length} in current view`}
+                icon={<Columns3 size={18} />}
+                tone="purple"
+              />
+              <StatCard
+                label="Completed"
+                value={completed}
+                note={`${tasks.length ? Math.round((completed / tasks.length) * 100) : 0}% completion rate`}
+                icon={<CircleCheckBig size={18} />}
+                tone="green"
+              />
+              <StatCard
+                label="High priority"
+                value={highPriority}
+                note="Needs focus"
+                icon={<CircleAlert size={18} />}
+                tone="orange"
+              />
+              <StatCard
+                label="Unassigned"
+                value={unassigned}
+                note={`${projects.length} active projects`}
+                icon={<Users size={18} />}
+                tone="blue"
+              />
+            </section>
+            <section className="workspace-card">
+              <div className="view-toolbar">
+                <div className="view-tabs">
+                  <button
+                    className={view === "table" ? "active" : ""}
+                    onClick={() => setView("table")}
+                  >
+                    <Table2 size={16} /> Table
+                  </button>
+                  <button
+                    className={view === "board" ? "active" : ""}
+                    onClick={() => setView("board")}
+                  >
+                    <Columns3 size={16} /> Board
+                  </button>
+                  <button
+                    className={view === "insights" ? "active" : ""}
+                    onClick={() => setView("insights")}
+                  >
+                    <BrainCircuit size={16} /> AI Focus
+                  </button>
+                </div>
+                <div className="toolbar-actions">
+                  <label className="search-box">
+                    <Search size={16} />
+                    <input
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      placeholder="Search actions…"
+                    />
+                  </label>
+                  <FilterSelect
+                    icon={<ListFilter size={15} />}
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={["All statuses", ...statuses]}
                   />
-                </label>
-                <FilterSelect
-                  icon={<ListFilter size={15} />}
-                  value={statusFilter}
-                  onChange={setStatusFilter}
-                  options={["All statuses", ...statuses]}
-                />
-                <FilterSelect
-                  value={priorityFilter}
-                  onChange={setPriorityFilter}
-                  options={["All priorities", ...priorities]}
-                />
-                <button
-                  className="icon-button bordered"
-                  title="Restore original imported data"
-                  onClick={() => void restoreImport()}
-                >
-                  <ArchiveRestore size={16} />
-                </button>
+                  <FilterSelect
+                    value={priorityFilter}
+                    onChange={setPriorityFilter}
+                    options={["All priorities", ...priorities]}
+                  />
+                  <button
+                    className="icon-button bordered"
+                    title="Restore original imported data"
+                    onClick={() => void restoreImport()}
+                  >
+                    <ArchiveRestore size={16} />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="result-bar">
-              <span>
-                <strong>{filteredTasks.length}</strong> actions
-              </span>
-              {(query ||
-                statusFilter !== "All statuses" ||
-                priorityFilter !== "All priorities") && (
-                <button
-                  onClick={() => {
-                    setQuery("");
-                    setStatusFilter("All statuses");
-                    setPriorityFilter("All priorities");
-                  }}
-                >
-                  Clear filters <X size={13} />
-                </button>
+              <div className="result-bar">
+                <span>
+                  <strong>{filteredTasks.length}</strong> actions
+                </span>
+                {(query ||
+                  statusFilter !== "All statuses" ||
+                  priorityFilter !== "All priorities") && (
+                  <button
+                    onClick={() => {
+                      setQuery("");
+                      setStatusFilter("All statuses");
+                      setPriorityFilter("All priorities");
+                    }}
+                  >
+                    Clear filters <X size={13} />
+                  </button>
+                )}
+              </div>
+              {view === "table" ? (
+                <TaskTable
+                  tasks={filteredTasks}
+                  onSelect={setSelectedKey}
+                  onUpdate={updateTask}
+                  onAddUpdate={addTaskUpdate}
+                  statuses={statuses}
+                  priorities={priorities}
+                />
+              ) : view === "board" ? (
+                <TaskBoard
+                  tasks={filteredTasks}
+                  statuses={statuses}
+                  onSelect={setSelectedKey}
+                  onUpdate={updateTask}
+                />
+              ) : (
+                <AiFocusBoard
+                  insights={insights}
+                  tasks={tasks}
+                  projectFilter={projectFilter}
+                  loading={insightLoading}
+                  error={insightError}
+                  generatedAt={insightGeneratedAt}
+                  stale={insightsStale}
+                  onAnalyze={() => void analyzeTasks()}
+                  onSelect={setSelectedKey}
+                />
               )}
-            </div>
-            {view === "table" ? (
-              <TaskTable
-                tasks={filteredTasks}
-                onSelect={setSelectedKey}
-                onUpdate={updateTask}
-                onAddUpdate={addTaskUpdate}
-                statuses={statuses}
-                priorities={priorities}
-              />
-            ) : view === "board" ? (
-              <TaskBoard
-                tasks={filteredTasks}
-                statuses={statuses}
-                onSelect={setSelectedKey}
-                onUpdate={updateTask}
-              />
-            ) : (
-              <AiFocusBoard
-                insights={insights}
-                tasks={tasks}
-                projectFilter={projectFilter}
-                loading={insightLoading}
-                error={insightError}
-                generatedAt={insightGeneratedAt}
-                stale={insightsStale}
-                onAnalyze={() => void analyzeTasks()}
-                onSelect={setSelectedKey}
-              />
-            )}
-          </section>
-        </div>
+            </section>
+          </div>
+        )}
       </main>
       {selectedTask && (
         <TaskDrawer
@@ -801,7 +916,7 @@ function App() {
           </button>
         </div>
       )}
-      {(gmailStatus || gmailError) && (
+      {page === "workspace" && (gmailStatus || gmailError) && (
         <div className={`gmail-status ${gmailError ? "error" : ""}`}>
           <div className="gmail-status-icon">
             {gmailError ? (
@@ -831,6 +946,278 @@ function App() {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function GmailSetupPage({
+  config,
+  testing,
+  status,
+  error,
+  onSave,
+  onTest,
+  onDisconnect,
+  onReset,
+}: {
+  config: GmailConfig;
+  testing: boolean;
+  status: string;
+  error: string;
+  onSave: (config: GmailConfig) => void;
+  onTest: (config: GmailConfig) => void;
+  onDisconnect: () => void;
+  onReset: () => void;
+}) {
+  const [draft, setDraft] = useState(config);
+  const [validationError, setValidationError] = useState("");
+  const authorizedOrigin = window.location.origin;
+
+  function validate(): GmailConfig | null {
+    const result = GmailConfigSchema.safeParse(draft);
+    if (!result.success) {
+      setValidationError(result.error.issues[0]?.message ?? "Check the form.");
+      return null;
+    }
+    setValidationError("");
+    return result.data;
+  }
+
+  return (
+    <div className="page-content gmail-setup-page">
+      <section className="page-heading gmail-heading">
+        <div className="heading-icon">
+          <MailCheck size={23} />
+        </div>
+        <div>
+          <p className="eyebrow">GMAIL INTEGRATION</p>
+          <h1>Gmail setup</h1>
+          <p>
+            Configure and verify the mailbox used to update project actions.
+          </p>
+        </div>
+      </section>
+
+      <div className="gmail-setup-grid">
+        <section className="settings-card gmail-config-card">
+          <header>
+            <div>
+              <span className="settings-step">1</span>
+              <div>
+                <h2>Connection details</h2>
+                <p>Saved only in this browser on this computer.</p>
+              </div>
+            </div>
+            <span className="local-badge">Local settings</span>
+          </header>
+          <div className="settings-card-body">
+            <label className="settings-field">
+              <span>Gmail account</span>
+              <input
+                type="email"
+                aria-label="Gmail account"
+                autoComplete="email"
+                value={draft.accountEmail}
+                placeholder="name@gmail.com"
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    accountEmail: event.target.value,
+                  }))
+                }
+              />
+              <small>
+                The authorized Google account must match this address.
+              </small>
+            </label>
+            <label className="settings-field">
+              <span>OAuth 2.0 client ID</span>
+              <input
+                aria-label="OAuth 2.0 client ID"
+                value={draft.clientId}
+                spellCheck={false}
+                placeholder="000000000000-example.apps.googleusercontent.com"
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    clientId: event.target.value,
+                  }))
+                }
+              />
+              <small>
+                Use a Google OAuth Web application client ID. Never paste a
+                client secret here.
+              </small>
+            </label>
+            {(validationError || error) && (
+              <div className="setup-message error">
+                <CircleAlert size={16} /> {validationError || error}
+              </div>
+            )}
+            {status && !error && (
+              <div className="setup-message success">
+                <CircleCheckBig size={16} /> {status}
+              </div>
+            )}
+            <div className="settings-actions">
+              <button
+                className="primary-button"
+                onClick={() => {
+                  const validated = validate();
+                  if (validated) onSave(validated);
+                }}
+              >
+                <Check size={16} /> Save configuration
+              </button>
+              <button
+                className="secondary-button test-gmail-button"
+                disabled={testing}
+                onClick={() => {
+                  const validated = validate();
+                  if (validated) onTest(validated);
+                }}
+              >
+                {testing ? (
+                  <RefreshCw className="spin" size={16} />
+                ) : (
+                  <MailCheck size={16} />
+                )}
+                {testing ? "Connecting…" : "Test connection"}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card google-cloud-card">
+          <header>
+            <div>
+              <span className="settings-step">2</span>
+              <div>
+                <h2>Google Cloud configuration</h2>
+                <p>Complete these steps in the Google Cloud Console.</p>
+              </div>
+            </div>
+            <a
+              href="https://console.cloud.google.com/apis/credentials"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open console
+            </a>
+          </header>
+          <div className="settings-card-body setup-checklist">
+            <div>
+              <span>
+                <Check size={13} />
+              </span>
+              <p>
+                <strong>Enable the Gmail API</strong> for your Google Cloud
+                project.
+              </p>
+            </div>
+            <div>
+              <span>
+                <Check size={13} />
+              </span>
+              <p>
+                <strong>Configure OAuth consent</strong> and add the Gmail
+                account as a test user while the app is in Testing status.
+              </p>
+            </div>
+            <div>
+              <span>
+                <Check size={13} />
+              </span>
+              <p>
+                Create an <strong>OAuth client ID</strong> with application type
+                <strong> Web application</strong>.
+              </p>
+            </div>
+            <div>
+              <span>
+                <Check size={13} />
+              </span>
+              <p>
+                Add this exact <strong>Authorized JavaScript origin</strong>:
+              </p>
+            </div>
+            <code className="origin-value">{authorizedOrigin}</code>
+            <div className="verification-note">
+              Google can show an “unverified app” warning while the OAuth app is
+              in Testing. Publishing and completing Google verification is the
+              route to removing that warning for wider use.
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card processing-card">
+          <header>
+            <div>
+              <span className="settings-step">3</span>
+              <div>
+                <h2>Processing rules</h2>
+                <p>The safeguards currently applied to every Gmail run.</p>
+              </div>
+            </div>
+          </header>
+          <div className="settings-card-body rules-list">
+            <div>
+              <strong>Mailbox filter</strong>
+              <span>Unread · Primary category only</span>
+            </div>
+            <div>
+              <strong>Project detection</strong>
+              <span>Existing project name in subject</span>
+            </div>
+            <div>
+              <strong>No action match</strong>
+              <span>Create a new sequential action</span>
+            </div>
+            <div>
+              <strong>After processing</strong>
+              <span>Mark relevant email as read</span>
+            </div>
+            <div>
+              <strong>Email sending</strong>
+              <span>Disabled</span>
+            </div>
+            <div>
+              <strong>AI processing</strong>
+              <span>Local Ollama qwen3.5:9b</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card session-card">
+          <header>
+            <div>
+              <span className="settings-step">4</span>
+              <div>
+                <h2>Session and privacy</h2>
+                <p>Manage local authorization and configuration.</p>
+              </div>
+            </div>
+          </header>
+          <div className="settings-card-body">
+            <p className="privacy-copy">
+              OAuth access tokens stay in memory and are not written to disk or
+              browser storage. The client ID is public configuration, not a
+              secret. Email content is not logged or sent to a hosted AI model.
+            </p>
+            <div className="settings-actions">
+              <button
+                className="secondary-button text-button"
+                onClick={onDisconnect}
+              >
+                Disconnect Gmail session
+              </button>
+              <button className="danger-button" onClick={onReset}>
+                Reset saved settings
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

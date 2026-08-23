@@ -1,5 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { exportCsv, parseCsv } from "./data";
+// @vitest-environment jsdom
+
+import { beforeEach, describe, expect, it } from "vitest";
+import {
+  clearSavedTasks,
+  exportCsv,
+  loadSeedTasks,
+  parseCsv,
+  saveTasks,
+} from "./data";
 import { COLUMN_NAMES, DISPLAY_COLUMNS, columnLabel } from "./types";
 
 const header = COLUMN_NAMES.map((column) => `"${column}"`).join(",");
@@ -17,6 +25,11 @@ const validRow = [
 ]
   .map((value) => `"${value}"`)
   .join(",");
+
+beforeEach(async () => {
+  window.localStorage.clear();
+  await clearSavedTasks();
+});
 
 describe("CSV data boundary", () => {
   it("uses the requested display order and history label", () => {
@@ -51,5 +64,32 @@ describe("CSV data boundary", () => {
   it("treats spreadsheet-like values as inert data", () => {
     const row = validRow.replace("Prepare launch plan", "=1+1");
     expect(parseCsv(`${header}\n${row}`)[0]?.Action).toBe("=1+1");
+  });
+
+  it("persists every action and update in the versioned durable store", async () => {
+    const tasks = parseCsv(`${header}\n${validRow}`);
+    tasks[0]!.Update = "23/08 Durable update";
+    tasks[0]!["Update History"] = "22/08 Previous update";
+
+    await saveTasks(tasks);
+    const restored = await loadSeedTasks();
+
+    expect(restored).toEqual(tasks);
+    expect(restored[0]?.Update).toBe("23/08 Durable update");
+    expect(restored[0]?.["Update History"]).toBe("22/08 Previous update");
+  });
+
+  it("migrates the existing localStorage action list without data loss", async () => {
+    const tasks = parseCsv(`${header}\n${validRow}`);
+    window.localStorage.setItem(
+      "pmo-workspace.tasks.v1",
+      JSON.stringify(tasks),
+    );
+
+    expect(await loadSeedTasks()).toEqual(tasks);
+    expect(window.localStorage.getItem("pmo-workspace.tasks.v1")).toBeNull();
+    expect(
+      window.localStorage.getItem("pmo-workspace.tasks.v2"),
+    ).not.toBeNull();
   });
 });
