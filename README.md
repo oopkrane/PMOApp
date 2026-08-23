@@ -19,6 +19,10 @@ A local, Notion-inspired project and action management application. The supplied
 
 ## Run locally
 
+On Windows, double-click `PMOApp.cmd` in the project folder. The launcher starts the local services, opens the app in the default browser, and leaves a clearly labelled server window open. Close that server window or press `Ctrl+C` in it to stop PMOApp.
+
+For command-line use:
+
 ```powershell
 npm install
 npm run dev
