@@ -65,9 +65,10 @@ import {
 import { loadWorkspaceView, saveWorkspaceView } from "./preferences";
 import {
   askProjectActions,
-  type ProjectChatAnswer,
+  loadSavedProjectChatMessages,
+  saveProjectChatMessages,
   type ProjectChatHistoryItem,
-  type ProjectChatReference,
+  type ProjectChatMessage,
 } from "./projectChat";
 import {
   COLUMN_NAMES,
@@ -80,14 +81,6 @@ import { applyTaskUpdate } from "./updates";
 import "./App.css";
 
 const completionPattern = /^(complete|completed|done|closed)$/i;
-
-interface ProjectChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  confidence?: ProjectChatAnswer["confidence"];
-  references?: ProjectChatReference[];
-}
 
 function uniqueValues(tasks: Task[], column: ColumnName): string[] {
   return [
@@ -128,7 +121,6 @@ function blankTask(id: string, key: string): Task {
   ) as Record<ColumnName, string>;
   return {
     ...empty,
-    Action: "Untitled action",
     ID: id,
     "Last edited time": new Date().toISOString(),
     _key: key,
@@ -173,7 +165,9 @@ function App() {
   const [gmailConnectionStatus, setGmailConnectionStatus] = useState("");
   const [gmailTesting, setGmailTesting] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ProjectChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ProjectChatMessage[]>(
+    loadSavedProjectChatMessages,
+  );
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -211,6 +205,10 @@ function App() {
       saveInsights(insights, insightGeneratedAt, insightsStale);
     }
   }, [insightGeneratedAt, insights, insightsStale]);
+
+  useEffect(() => {
+    saveProjectChatMessages(chatMessages);
+  }, [chatMessages]);
 
   useEffect(() => {
     if (!notice) return;
@@ -756,20 +754,6 @@ function App() {
           />
         ) : (
           <div className="page-content">
-            <section className="page-heading">
-              <div className="heading-icon">
-                <Sparkles size={23} />
-              </div>
-              <div>
-                <p className="eyebrow">PMO CONTROL CENTRE</p>
-                <h1>
-                  {projectFilter === "All projects"
-                    ? "Action tracker"
-                    : projectFilter}
-                </h1>
-                <p>Plan, track and move every project action forward.</p>
-              </div>
-            </section>
             <section className="stats-grid" aria-label="Workspace statistics">
               <StatCard
                 label="Total actions"
@@ -1962,6 +1946,8 @@ function TaskDrawer({
           <textarea
             className="title-input"
             value={task.Action}
+            autoFocus={task._key.startsWith("new-")}
+            placeholder="Enter action"
             onChange={(event) =>
               onUpdate(task._key, "Action", event.target.value)
             }

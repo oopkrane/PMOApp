@@ -10,6 +10,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AiInsightResult, SavedAiInsight } from "./insights";
+import { saveProjectChatMessages } from "./projectChat";
 import type { Task } from "./types";
 
 const testState = vi.hoisted(() => ({
@@ -85,6 +86,7 @@ import App from "./App";
 
 beforeEach(() => {
   window.localStorage.clear();
+  Element.prototype.scrollIntoView = vi.fn();
   testState.saved = null;
   tasks.forEach((task) => {
     task.Status = "In progress";
@@ -154,6 +156,29 @@ describe("AI model setup", () => {
   });
 });
 
+describe("Ask PMO persistence", () => {
+  it("keeps the previous response after the window closes and reopens", async () => {
+    saveProjectChatMessages([
+      {
+        id: "answer-1",
+        role: "assistant",
+        content: "Action 1 needs attention.",
+        confidence: "high",
+      },
+    ]);
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /Ask PMO/i }));
+    expect(screen.getByText("Action 1 needs attention.")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByText("Action 1 needs attention.")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Ask PMO/i }));
+    expect(screen.getByText("Action 1 needs attention.")).toBeInTheDocument();
+  });
+});
+
 describe("completed action filtering", () => {
   it("hides done actions without deleting them", async () => {
     tasks[2]!.Status = "Done";
@@ -165,5 +190,19 @@ describe("completed action filtering", () => {
     expect(screen.queryByText("Action 3")).not.toBeInTheDocument();
     fireEvent.click(toggle);
     expect(screen.getByText("Action 3")).toBeInTheDocument();
+  });
+});
+
+describe("new action creation", () => {
+  it("opens with an empty focused action title", async () => {
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: /New action/i }),
+    );
+
+    const title = screen.getByRole("textbox", { name: "Action title" });
+    expect(title).toHaveValue("");
+    expect(title).toHaveFocus();
+    expect(title).toHaveAttribute("placeholder", "Enter action");
   });
 });
