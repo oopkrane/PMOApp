@@ -287,6 +287,12 @@ function App() {
     setSelectedKey(key);
   }
 
+  function selectProject(project: string) {
+    setPage("workspace");
+    if (project !== projectFilter) setQuery("");
+    setProjectFilter(project);
+  }
+
   function deleteTask(key: string) {
     markInsightsStale();
     setTasks((current) => current.filter((task) => task._key !== key));
@@ -601,10 +607,7 @@ function App() {
           </div>
           <button
             className={`project-link ${projectFilter === "All projects" ? "selected" : ""}`}
-            onClick={() => {
-              setPage("workspace");
-              setProjectFilter("All projects");
-            }}
+            onClick={() => selectProject("All projects")}
           >
             <span className="project-icon all">
               <FolderKanban size={14} />
@@ -616,10 +619,7 @@ function App() {
             <button
               className={`project-link ${projectFilter === project ? "selected" : ""}`}
               key={project}
-              onClick={() => {
-                setPage("workspace");
-                setProjectFilter(project);
-              }}
+              onClick={() => selectProject(project)}
             >
               <span className={`project-icon color-${index % 5}`}>
                 {project.slice(0, 1).toUpperCase()}

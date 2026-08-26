@@ -90,6 +90,7 @@ beforeEach(() => {
   testState.saved = null;
   tasks.forEach((task) => {
     task.Status = "In progress";
+    task.Project = "Project A";
   });
 });
 
@@ -190,6 +191,24 @@ describe("completed action filtering", () => {
     expect(screen.queryByText("Action 3")).not.toBeInTheDocument();
     fireEvent.click(toggle);
     expect(screen.getByText("Action 3")).toBeInTheDocument();
+  });
+});
+
+describe("action search", () => {
+  it("clears the search when a different project is selected", async () => {
+    tasks[1]!.Project = "Project B";
+    render(<App />);
+
+    const search = await screen.findByPlaceholderText(/Search actions/i);
+    fireEvent.change(search, { target: { value: "Action 1" } });
+    expect(search).toHaveValue("Action 1");
+
+    fireEvent.click(screen.getByRole("button", { name: /Project A/i }));
+    expect(search).toHaveValue("");
+
+    fireEvent.change(search, { target: { value: "Action 1" } });
+    fireEvent.click(screen.getByRole("button", { name: /Project B/i }));
+    expect(search).toHaveValue("");
   });
 });
 
