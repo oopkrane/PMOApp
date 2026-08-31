@@ -82,6 +82,31 @@ vi.mock("./ollama", () => ({
   ]),
 }));
 
+vi.mock("./meetingMinutes", () => ({
+  formatMeetingMinutes: vi.fn(() => "# Project meeting"),
+  generateMeetingMinutes: vi.fn(async () => ({
+    title: "Project review",
+    meetingDate: "2026-08-28",
+    attendees: ["Owner"],
+    summary: "The team reviewed delivery.",
+    discussionPoints: ["The current work remains in progress."],
+    decisions: ["Continue with the agreed approach."],
+    actions: [
+      {
+        id: "meeting-action-1",
+        action: "Confirm the next delivery step",
+        owner: "Owner",
+        dueDate: "Friday",
+        priority: "High",
+        context: "Owner will confirm the next delivery step by Friday.",
+        suggestedTaskKey: "key-1",
+        matchConfidence: 0.91,
+        matchReason: "Same delivery work.",
+      },
+    ],
+  })),
+}));
+
 import App from "./App";
 
 beforeEach(() => {
@@ -91,6 +116,7 @@ beforeEach(() => {
   tasks.forEach((task) => {
     task.Status = "In progress";
     task.Project = "Project A";
+    task["Update History"] = "";
   });
 });
 
@@ -173,7 +199,9 @@ describe("Ask PMO persistence", () => {
     expect(screen.getByText("Action 1 needs attention.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
-    expect(screen.queryByText("Action 1 needs attention.")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Action 1 needs attention."),
+    ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /Ask PMO/i }));
     expect(screen.getByText("Action 1 needs attention.")).toBeInTheDocument();
@@ -212,16 +240,129 @@ describe("action search", () => {
   });
 });
 
+describe("action history", () => {
+  it("exposes the full cell content on hover while remaining editable", async () => {
+    tasks[0]!["Update History"] = "22/08 Previous update with full details";
+    render(<App />);
+
+    const input = await screen.findByLabelText("Action History for Action 1");
+    expect(input).toHaveValue("22/08 Previous update with full details");
+    expect(input.parentElement).toHaveClass("full-content-hover");
+    expect(input.parentElement).toHaveAttribute(
+      "data-full-text",
+      "22/08 Previous update with full details",
+    );
+  });
+});
+
 describe("new action creation", () => {
   it("opens with an empty focused action title", async () => {
     render(<App />);
-    fireEvent.click(
-      await screen.findByRole("button", { name: /New action/i }),
-    );
+    fireEvent.click(await screen.findByRole("button", { name: /New action/i }));
 
     const title = screen.getByRole("textbox", { name: "Action title" });
     expect(title).toHaveValue("");
     expect(title).toHaveFocus();
     expect(title).toHaveAttribute("placeholder", "Enter action");
+  });
+});
+
+describe("meeting transcript workflow", () => {
+  it("confirms a project and lets the user match an extracted action", async () => {
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: /Meeting minutes/i }),
+    );
+
+    fireEvent.change(screen.getByLabelText("Relevant project"), {
+      target: { value: "Project A" },
+    });
+    expect(
+      screen.getByText(/Confirmed · 3 existing actions/i),
+    ).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Meeting transcript"), {
+      target: {
+        value:
+          "Owner: We reviewed delivery. I will confirm the next delivery step by Friday.",
+      },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /Generate minutes & actions/i }),
+    );
+
+    expect(await screen.findByText("Project review")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Decision for Confirm the next delivery step"),
+    ).toHaveValue("match:key-1");
+    fireEvent.click(
+      screen.getByRole("button", { name: /Apply selected actions/i }),
+    );
+    expect(
+      await screen.findByText("0 actions added · 1 action updated"),
+    ).toBeInTheDocument();
+  });
+
+  it("edits action details and adds a manual action before applying", async () => {
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: /Meeting minutes/i }),
+    );
+    fireEvent.change(screen.getByLabelText("Relevant project"), {
+      target: { value: "Project A" },
+    });
+    fireEvent.change(screen.getByLabelText("Meeting transcript"), {
+      target: {
+        value:
+          "Owner: We reviewed delivery. I will confirm the next delivery step by Friday.",
+      },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /Generate minutes & actions/i }),
+    );
+
+    expect(await screen.findByText("Project review")).toBeInTheDocument();
+    fireEvent.change(
+      screen.getByLabelText("Owner for Confirm the next delivery step"),
+      { target: { value: "Delivery lead" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText("Priority for Confirm the next delivery step"),
+      { target: { value: "Medium" } },
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add action" }));
+    fireEvent.change(screen.getByLabelText("Additional action title"), {
+      target: { value: "Send the revised delivery plan" },
+    });
+    fireEvent.change(
+      screen.getByLabelText("Owner for Send the revised delivery plan"),
+      { target: { value: "Project manager" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText("Priority for Send the revised delivery plan"),
+      { target: { value: "Urgent" } },
+    );
+
+    expect(screen.getByText("2 selected")).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: /Apply selected actions/i }),
+    );
+
+    expect(
+      await screen.findByText(/1 action added.*1 action updated/),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Owner for Action 1")).toHaveValue(
+      "Delivery lead",
+    );
+    expect(screen.getByLabelText("Priority for Action 1")).toHaveValue(
+      "Medium",
+    );
+    expect(
+      screen.getByLabelText("Owner for Send the revised delivery plan"),
+    ).toHaveValue("Project manager");
+    expect(
+      screen.getByLabelText("Priority for Send the revised delivery plan"),
+    ).toHaveValue("Urgent");
   });
 });

@@ -8,7 +8,10 @@ import {
   ChevronDown,
   CircleAlert,
   CircleCheckBig,
+  ClipboardList,
   Columns3,
+  Copy,
+  FileText,
   FolderKanban,
   LayoutDashboard,
   ListFilter,
@@ -63,6 +66,12 @@ import {
   type InstalledOllamaModel,
 } from "./ollama";
 import { loadWorkspaceView, saveWorkspaceView } from "./preferences";
+import {
+  formatMeetingMinutes,
+  generateMeetingMinutes,
+  type MeetingAction,
+  type MeetingAnalysis,
+} from "./meetingMinutes";
 import {
   askProjectActions,
   loadSavedProjectChatMessages,
@@ -170,6 +179,7 @@ function App() {
   );
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState("");
+  const [meetingOpen, setMeetingOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -559,6 +569,76 @@ function App() {
     }
   }
 
+  function applyMeetingActions(
+    result: MeetingAnalysis,
+    project: string,
+    selections: Record<string, string>,
+  ) {
+    let workingTasks = tasks;
+    let created = 0;
+    let updated = 0;
+    const openStatus =
+      uniqueValues(workingTasks, "Status").find((status) =>
+        /not started|to do|open/i.test(status),
+      ) ?? "";
+
+    for (const action of result.actions) {
+      const selection = selections[action.id] ?? "skip";
+      if (selection === "skip" || !action.action.trim()) continue;
+      const update = [
+        `Meeting: ${action.context || action.action}`,
+        action.dueDate ? `Due: ${action.dueDate}` : "",
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      if (selection.startsWith("match:")) {
+        const key = selection.slice("match:".length);
+        if (!workingTasks.some((task) => task._key === key)) continue;
+        workingTasks = workingTasks.map((task) =>
+          task._key === key
+            ? applyTaskUpdate(
+                {
+                  ...task,
+                  Owner: action.owner.trim() || task.Owner,
+                  Priority: action.priority || task.Priority,
+                },
+                update,
+              )
+            : task,
+        );
+        updated += 1;
+        continue;
+      }
+      if (selection === "create") {
+        let task = blankTask(
+          nextSequentialId(workingTasks),
+          `meeting-${crypto.randomUUID()}`,
+        );
+        task = {
+          ...task,
+          Action: action.action.trim(),
+          Owner: action.owner.trim(),
+          Priority: action.priority,
+          Project: project,
+          Status: openStatus,
+        };
+        workingTasks = [applyTaskUpdate(task, update), ...workingTasks];
+        created += 1;
+      }
+    }
+    if (created + updated === 0) {
+      setNotice("No meeting actions selected");
+      return;
+    }
+    markInsightsStale();
+    setTasks(workingTasks);
+    setMeetingOpen(false);
+    setProjectFilter(project);
+    setNotice(
+      `${created} action${created === 1 ? "" : "s"} added · ${updated} action${updated === 1 ? "" : "s"} updated`,
+    );
+  }
+
   if (loading)
     return (
       <div className="state-page">
@@ -682,6 +762,12 @@ function App() {
                 onClick={() => setChatOpen(true)}
               >
                 <BrainCircuit size={16} /> Ask PMO
+              </button>
+              <button
+                className="secondary-button meeting-button"
+                onClick={() => setMeetingOpen(true)}
+              >
+                <ClipboardList size={16} /> Meeting minutes
               </button>
               <button
                 className="secondary-button gmail-button"
@@ -928,6 +1014,16 @@ function App() {
           }}
         />
       )}
+      {meetingOpen && (
+        <MeetingMinutesWindow
+          projects={projects}
+          initialProject={projectFilter === "All projects" ? "" : projectFilter}
+          tasks={tasks}
+          model={ollamaModel}
+          onClose={() => setMeetingOpen(false)}
+          onApply={applyMeetingActions}
+        />
+      )}
       <datalist id="owner-options">
         {owners.map((owner) => (
           <option key={owner} value={owner} />
@@ -1080,7 +1176,10 @@ function OllamaSetupPage({
           <div className="selected-model-summary">
             <span>Application model</span>
             <strong>{selectedModel}</strong>
-            <small>Used by AI Focus, Ask PMO, and Gmail action matching.</small>
+            <small>
+              Used by AI Focus, Ask PMO, meeting minutes, and Gmail action
+              matching.
+            </small>
           </div>
 
           {scanError && (
@@ -1535,6 +1634,19 @@ function TaskTable({
                       actionName={task.Action}
                       onAdd={(update) => onAddUpdate(task._key, update)}
                     />
+                  ) : column === "Update History" ? (
+                    <div
+                      className={`action-history-cell full-content-hover ${task[column] ? "" : "empty"}`}
+                      data-full-text={task[column]}
+                    >
+                      <input
+                        aria-label={`${columnLabel(column)} for ${task.Action}`}
+                        value={task[column]}
+                        onChange={(event) =>
+                          onUpdate(task._key, column, event.target.value)
+                        }
+                      />
+                    </div>
                   ) : column === "Status" ? (
                     <select
                       className={`pill-select ${statusTone(task.Status)}`}
@@ -1634,7 +1746,7 @@ function UpdateCell({
   if (!open) {
     return (
       <button
-        className={`update-preview ${value ? "" : "empty"}`}
+        className={`update-preview full-content-hover ${value ? "" : "empty"}`}
         aria-label={`Add update for ${actionName}`}
         data-full-text={value}
         title={value}
@@ -2009,6 +2121,505 @@ function TaskDrawer({
           <span>Changes save automatically</span>
         </footer>
       </aside>
+    </div>
+  );
+}
+
+function MeetingMinutesWindow({
+  projects,
+  initialProject,
+  tasks,
+  model,
+  onClose,
+  onApply,
+}: {
+  projects: string[];
+  initialProject: string;
+  tasks: Task[];
+  model: string;
+  onClose: () => void;
+  onApply: (
+    result: MeetingAnalysis,
+    project: string,
+    selections: Record<string, string>,
+  ) => void;
+}) {
+  const [project, setProject] = useState(initialProject);
+  const [transcript, setTranscript] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [dragging, setDragging] = useState(false);
+  const [result, setResult] = useState<MeetingAnalysis | null>(null);
+  const [selections, setSelections] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const transcriptFileRef = useRef<HTMLInputElement>(null);
+  const projectTasks = tasks.filter((task) => task.Project === project);
+  const selectedCount =
+    result?.actions.filter(
+      (action) =>
+        (selections[action.id] ?? "skip") !== "skip" && action.action.trim(),
+    ).length ?? 0;
+
+  function updateAction(id: string, changes: Partial<MeetingAction>) {
+    setResult((current) =>
+      current
+        ? {
+            ...current,
+            actions: current.actions.map((action) =>
+              action.id === id ? { ...action, ...changes } : action,
+            ),
+          }
+        : current,
+    );
+  }
+
+  function addAction() {
+    const id = `manual-${crypto.randomUUID()}`;
+    const action: MeetingAction = {
+      id,
+      action: "",
+      owner: "",
+      dueDate: "",
+      priority: "",
+      context: "",
+      suggestedTaskKey: null,
+      matchConfidence: 0,
+      matchReason: "Added during meeting review.",
+    };
+    setResult((current) =>
+      current ? { ...current, actions: [...current.actions, action] } : current,
+    );
+    setSelections((current) => ({ ...current, [id]: "create" }));
+  }
+
+  async function readTranscript(file: File) {
+    if (file.size > 1_000_000) {
+      setError("The transcript file is too large. Keep it under 1 MB.");
+      return;
+    }
+    try {
+      const text = await file.text();
+      if (!text.trim()) throw new Error("The selected transcript is empty.");
+      setTranscript(text);
+      setFileName(file.name);
+      setResult(null);
+      setError("");
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "The transcript file could not be read.",
+      );
+    }
+  }
+
+  async function generate() {
+    setLoading(true);
+    setError("");
+    try {
+      const generated = await generateMeetingMinutes(
+        transcript,
+        project,
+        projectTasks,
+        model,
+      );
+      setResult(generated);
+      setSelections(
+        Object.fromEntries(
+          generated.actions.map((action) => [
+            action.id,
+            action.suggestedTaskKey
+              ? `match:${action.suggestedTaskKey}`
+              : "create",
+          ]),
+        ),
+      );
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "The meeting transcript could not be analyzed.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function copyMinutes() {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(
+        formatMeetingMinutes(result, project),
+      );
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setError("The minutes could not be copied to the clipboard.");
+    }
+  }
+
+  return (
+    <div
+      className="meeting-backdrop"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !loading) onClose();
+      }}
+    >
+      <section className="meeting-window" aria-label="Meeting minutes">
+        <header className="meeting-header">
+          <span className="chat-model-icon">
+            <ClipboardList size={20} />
+          </span>
+          <div>
+            <strong>Meeting minutes</strong>
+            <span>{model} · Transcript stays on this computer</span>
+          </div>
+          <button
+            className="icon-button"
+            aria-label="Close meeting minutes"
+            disabled={loading}
+            onClick={onClose}
+          >
+            <X size={19} />
+          </button>
+        </header>
+
+        <div className="meeting-body">
+          <section className="meeting-input-panel">
+            <div className="meeting-section-heading">
+              <span>1</span>
+              <div>
+                <strong>Confirm the project</strong>
+                <small>Actions can only be matched within this project.</small>
+              </div>
+            </div>
+            <label className="meeting-project-select">
+              <span>Relevant project</span>
+              <select
+                value={project}
+                onChange={(event) => {
+                  setProject(event.target.value);
+                  setResult(null);
+                }}
+                aria-label="Relevant project"
+              >
+                <option value="">Select a project…</option>
+                {projects.map((candidate) => (
+                  <option key={candidate}>{candidate}</option>
+                ))}
+              </select>
+              {project && (
+                <small className="project-confirmation">
+                  <Check size={12} /> Confirmed · {projectTasks.length} existing
+                  actions
+                </small>
+              )}
+            </label>
+
+            <div className="meeting-section-heading transcript-heading">
+              <span>2</span>
+              <div>
+                <strong>Add the transcript</strong>
+                <small>
+                  Drop a text, Markdown, VTT, or SRT file—or paste it.
+                </small>
+              </div>
+            </div>
+            <div
+              className={`transcript-dropzone ${dragging ? "dragging" : ""}`}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                setDragging(true);
+              }}
+              onDragOver={(event) => event.preventDefault()}
+              onDragLeave={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node))
+                  setDragging(false);
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDragging(false);
+                const file = event.dataTransfer.files[0];
+                if (file) void readTranscript(file);
+              }}
+            >
+              <textarea
+                value={transcript}
+                maxLength={250_000}
+                aria-label="Meeting transcript"
+                placeholder="Paste the meeting transcript here…"
+                onChange={(event) => {
+                  setTranscript(event.target.value);
+                  setFileName("");
+                  setResult(null);
+                }}
+              />
+              <div className="dropzone-footer">
+                <span>
+                  <FileText size={14} />
+                  {fileName ||
+                    (transcript
+                      ? `${transcript.length.toLocaleString()} characters`
+                      : "Drop transcript file here")}
+                </span>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => transcriptFileRef.current?.click()}
+                >
+                  Choose file
+                </button>
+                <input
+                  ref={transcriptFileRef}
+                  type="file"
+                  hidden
+                  accept=".txt,.md,.vtt,.srt,text/plain,text/markdown,text/vtt"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) void readTranscript(file);
+                    event.currentTarget.value = "";
+                  }}
+                />
+              </div>
+            </div>
+            <button
+              className="primary-button generate-minutes-button"
+              disabled={loading || !project || transcript.trim().length < 20}
+              onClick={() => void generate()}
+            >
+              {loading ? (
+                <RefreshCw className="spin" size={16} />
+              ) : (
+                <Sparkles size={16} />
+              )}
+              {loading ? "Preparing minutes…" : "Generate minutes & actions"}
+            </button>
+            {error && (
+              <div className="meeting-error">
+                <CircleAlert size={15} /> {error}
+              </div>
+            )}
+          </section>
+
+          <section className="meeting-review-panel">
+            {!result ? (
+              <div className="meeting-placeholder">
+                <ClipboardList size={31} />
+                <strong>Minutes and actions will appear here</strong>
+                <span>
+                  Confirm a project and add a transcript to start the review.
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="minutes-toolbar">
+                  <div>
+                    <span>Meeting minutes</span>
+                    <h2>{result.title}</h2>
+                  </div>
+                  <button
+                    className="secondary-button"
+                    onClick={() => void copyMinutes()}
+                  >
+                    {copied ? <Check size={15} /> : <Copy size={15} />}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                </div>
+                <article className="minutes-document">
+                  <div className="minutes-meta">
+                    {result.meetingDate && <span>{result.meetingDate}</span>}
+                    {result.attendees.length > 0 && (
+                      <span>{result.attendees.join(", ")}</span>
+                    )}
+                  </div>
+                  <h3>Summary</h3>
+                  <p>{result.summary}</p>
+                  {result.discussionPoints.length > 0 && (
+                    <>
+                      <h3>Discussion</h3>
+                      <ul>
+                        {result.discussionPoints.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  {result.decisions.length > 0 && (
+                    <>
+                      <h3>Decisions</h3>
+                      <ul>
+                        {result.decisions.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </article>
+
+                <div className="action-review-heading">
+                  <div>
+                    <span>3</span>
+                    <div>
+                      <strong>Review meeting actions</strong>
+                      <small>
+                        Review the details, then choose add, match, or skip.
+                      </small>
+                    </div>
+                  </div>
+                  <div className="action-review-controls">
+                    <b>{selectedCount} selected</b>
+                    <button
+                      type="button"
+                      className="secondary-button add-meeting-action-button"
+                      onClick={addAction}
+                    >
+                      <Plus size={14} /> Add action
+                    </button>
+                  </div>
+                </div>
+                {result.actions.length === 0 ? (
+                  <div className="no-meeting-actions">
+                    No explicit meeting actions were found. You can add one
+                    manually.
+                  </div>
+                ) : (
+                  <div className="meeting-actions-list">
+                    {result.actions.map((action) => {
+                      const selection = selections[action.id] ?? "skip";
+                      const suggestedTask = action.suggestedTaskKey
+                        ? projectTasks.find(
+                            (task) => task._key === action.suggestedTaskKey,
+                          )
+                        : null;
+                      return (
+                        <article
+                          className={`meeting-action-card ${selection === "skip" ? "skipped" : ""}`}
+                          key={action.id}
+                        >
+                          <div className="meeting-action-copy">
+                            {action.id.startsWith("manual-") ? (
+                              <label className="meeting-action-title-field">
+                                <span>Action</span>
+                                <input
+                                  autoFocus
+                                  aria-label="Additional action title"
+                                  placeholder="Describe the additional action"
+                                  value={action.action}
+                                  onChange={(event) =>
+                                    updateAction(action.id, {
+                                      action: event.target.value,
+                                    })
+                                  }
+                                />
+                              </label>
+                            ) : (
+                              <strong>{action.action}</strong>
+                            )}
+                            {action.context && <p>{action.context}</p>}
+                            <div className="meeting-action-fields">
+                              <label>
+                                <span>Owner</span>
+                                <input
+                                  aria-label={`Owner for ${action.action || "additional action"}`}
+                                  list="owner-options"
+                                  placeholder="Unassigned"
+                                  value={action.owner}
+                                  disabled={selection === "skip"}
+                                  onChange={(event) =>
+                                    updateAction(action.id, {
+                                      owner: event.target.value,
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                <span>Priority</span>
+                                <select
+                                  aria-label={`Priority for ${action.action || "additional action"}`}
+                                  value={action.priority}
+                                  disabled={selection === "skip"}
+                                  onChange={(event) =>
+                                    updateAction(action.id, {
+                                      priority: event.target
+                                        .value as MeetingAction["priority"],
+                                    })
+                                  }
+                                >
+                                  <option value="">No priority</option>
+                                  <option value="Low">Low</option>
+                                  <option value="Medium">Medium</option>
+                                  <option value="High">High</option>
+                                  <option value="Urgent">Urgent</option>
+                                </select>
+                              </label>
+                              {action.dueDate && (
+                                <span>Due: {action.dueDate}</span>
+                              )}
+                            </div>
+                            {suggestedTask && (
+                              <small>
+                                Suggested match #{suggestedTask.ID} ·{" "}
+                                {Math.round(action.matchConfidence * 100)}%
+                                confidence
+                              </small>
+                            )}
+                          </div>
+                          <label>
+                            <span>Action list decision</span>
+                            <select
+                              aria-label={`Decision for ${action.action}`}
+                              value={selection}
+                              onChange={(event) =>
+                                setSelections((current) => ({
+                                  ...current,
+                                  [action.id]: event.target.value,
+                                }))
+                              }
+                            >
+                              <option value="create">Add as new action</option>
+                              <optgroup label="Match existing action">
+                                {projectTasks.map((task) => (
+                                  <option
+                                    key={task._key}
+                                    value={`match:${task._key}`}
+                                  >
+                                    #{task.ID} · {task.Action}
+                                  </option>
+                                ))}
+                              </optgroup>
+                              <option value="skip">Skip this action</option>
+                            </select>
+                          </label>
+                        </article>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </section>
+        </div>
+        {result && (
+          <footer className="meeting-footer">
+            <span>
+              {selectedCount
+                ? `${selectedCount} action${selectedCount === 1 ? "" : "s"} will change the ${project} action list.`
+                : "Minutes are ready. No action-list changes selected."}
+            </span>
+            <button className="secondary-button" onClick={onClose}>
+              Close
+            </button>
+            <button
+              className="primary-button"
+              disabled={selectedCount === 0}
+              onClick={() => onApply(result, project, selections)}
+            >
+              <Check size={16} /> Apply selected actions
+            </button>
+          </footer>
+        )}
+      </section>
     </div>
   );
 }
