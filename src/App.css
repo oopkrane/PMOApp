@@ -1795,11 +1795,44 @@
 .chat-message-meta strong {
   font-size: 9px;
 }
-.chat-message p {
+.chat-message-content p,
+.chat-message-content ol,
+.chat-message-content ul {
   margin: 0;
   font-size: 11px;
   line-height: 1.65;
-  white-space: pre-wrap;
+}
+.chat-message-content p + p,
+.chat-message-content p + ol,
+.chat-message-content p + ul,
+.chat-message-content ol + p,
+.chat-message-content ul + p {
+  margin-top: 8px;
+}
+.chat-message-content ol,
+.chat-message-content ul {
+  padding-left: 20px;
+}
+.chat-message-content li + li {
+  margin-top: 2px;
+}
+.chat-copy {
+  margin-left: auto;
+  padding: 2px 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #716b79;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  font: inherit;
+  font-size: 8px;
+  cursor: pointer;
+}
+.chat-copy:hover {
+  color: var(--purple);
+  background: #f4f1ff;
 }
 .confidence {
   padding: 2px 6px;

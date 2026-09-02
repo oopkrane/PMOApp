@@ -87,6 +87,11 @@ import {
   type Task,
 } from "./types";
 import { applyTaskUpdate } from "./updates";
+import {
+  copyChatContent,
+  parseChatContent,
+  type ChatContentBlock,
+} from "./chatFormatting";
 import "./App.css";
 
 const completionPattern = /^(complete|completed|done|closed)$/i;
@@ -2644,6 +2649,7 @@ function ProjectChatWindow({
   onSelectReference: (key: string) => void;
 }) {
   const [draft, setDraft] = useState("");
+  const [copiedMessageId, setCopiedMessageId] = useState("");
   const messageEndRef = useRef<HTMLDivElement>(null);
   const suggestions = [
     "Which high-priority actions need attention?",
@@ -2660,6 +2666,38 @@ function ProjectChatWindow({
     if (!trimmed || loading) return;
     onAsk(trimmed);
     setDraft("");
+  }
+
+  async function copyResponse(message: ProjectChatMessage) {
+    try {
+      await copyChatContent(message.content);
+      setCopiedMessageId(message.id);
+      window.setTimeout(() => setCopiedMessageId(""), 2_000);
+    } catch {
+      setCopiedMessageId("");
+    }
+  }
+
+  function renderContentBlock(block: ChatContentBlock, index: number) {
+    if (block.type === "paragraph") {
+      return <p key={index}>{block.text}</p>;
+    }
+    if (block.type === "ordered-list") {
+      return (
+        <ol key={index} start={block.start}>
+          {block.items.map((item, itemIndex) => (
+            <li key={itemIndex}>{item}</li>
+          ))}
+        </ol>
+      );
+    }
+    return (
+      <ul key={index}>
+        {block.items.map((item, itemIndex) => (
+          <li key={itemIndex}>{item}</li>
+        ))}
+      </ul>
+    );
   }
 
   return (
@@ -2717,8 +2755,28 @@ function ProjectChatWindow({
                       {message.confidence} confidence
                     </span>
                   )}
+                  {message.role === "assistant" && (
+                    <button
+                      className="chat-copy"
+                      aria-label="Copy response"
+                      title="Copy response with formatting"
+                      onClick={() => void copyResponse(message)}
+                    >
+                      {copiedMessageId === message.id ? (
+                        <>
+                          <Check size={13} /> Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={13} /> Copy
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
-                <p>{message.content}</p>
+                <div className="chat-message-content">
+                  {parseChatContent(message.content).map(renderContentBlock)}
+                </div>
                 {message.references && message.references.length > 0 && (
                   <div className="chat-references">
                     <span>Referenced actions</span>
