@@ -211,7 +211,7 @@ async function gmailFetch<T>(
     if (response.status === 401) clearCachedGmailToken();
     throw new Error(
       response.status === 401
-        ? "Google authorization expired. Select Process Gmail again."
+        ? "Google authorization expired. Select Process Email again."
         : `Gmail request failed (${response.status}).`,
     );
   }

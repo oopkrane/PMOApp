@@ -725,7 +725,7 @@ function App() {
             className={`nav-item ${page === "gmail-setup" ? "active" : ""}`}
             onClick={() => setPage("gmail-setup")}
           >
-            <Settings size={17} /> Gmail setup
+            <Settings size={17} /> Email Setup
           </button>
           <div className="profile">
             <div className="avatar">PM</div>
@@ -784,7 +784,7 @@ function App() {
                 ) : (
                   <MailCheck size={16} />
                 )}
-                {gmailProcessing ? "Processing…" : "Process Gmail"}
+                {gmailProcessing ? "Processing…" : "Process Email"}
               </button>
               <button
                 className="secondary-button"

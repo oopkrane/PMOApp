@@ -146,7 +146,7 @@ describe("Gmail setup", () => {
   it("opens the configuration page from the sidebar", async () => {
     render(<App />);
     fireEvent.click(
-      await screen.findByRole("button", { name: /Gmail setup/i }),
+      await screen.findByRole("button", { name: /Email Setup/i }),
     );
 
     expect(
