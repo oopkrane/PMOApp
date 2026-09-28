@@ -158,7 +158,7 @@ function App() {
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [priorityFilter, setPriorityFilter] = useState("All priorities");
   const [projectFilter, setProjectFilter] = useState("All projects");
-  const [hideDone, setHideDone] = useState(false);
+  const [hideDone, setHideDone] = useState(true);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notice, setNotice] = useState("");
@@ -175,6 +175,7 @@ function App() {
   );
   const [gmailProcessing, setGmailProcessing] = useState(false);
   const [gmailStatus, setGmailStatus] = useState("");
+  const [gmailResults, setGmailResults] = useState<Task[]>([]);
   const [gmailError, setGmailError] = useState("");
   const [gmailConnectionStatus, setGmailConnectionStatus] = useState("");
   const [gmailTesting, setGmailTesting] = useState(false);
@@ -394,6 +395,7 @@ function App() {
     }
 
     setGmailProcessing(true);
+    setGmailResults([]);
     setGmailError("");
     setGmailStatus(`Connecting to ${gmailConfig.accountEmail}…`);
     try {
@@ -441,6 +443,12 @@ function App() {
               : task,
           );
           updated += 1;
+          const updatedTask = workingTasks.find(
+            (task) => task._key === decision.taskKey,
+          );
+          if (updatedTask) {
+            setGmailResults((results) => [...results, updatedTask]);
+          }
         } else {
           const key = `email-${crypto.randomUUID()}`;
           let newTask = blankTask(nextSequentialId(workingTasks), key);
@@ -462,6 +470,7 @@ function App() {
           );
           workingTasks = [newTask, ...workingTasks];
           created += 1;
+          setGmailResults((results) => [...results, newTask]);
         }
         setTasks(workingTasks);
       }
@@ -1053,7 +1062,9 @@ function App() {
         </div>
       )}
       {page === "workspace" && (gmailStatus || gmailError) && (
-        <div className={`gmail-status ${gmailError ? "error" : ""}`}>
+        <div
+          className={`gmail-status ${gmailError ? "error" : ""} ${gmailResults.length ? "has-results" : ""}`}
+        >
           <div className="gmail-status-icon">
             {gmailError ? (
               <CircleAlert size={18} />
@@ -1075,10 +1086,33 @@ function App() {
               onClick={() => {
                 setGmailStatus("");
                 setGmailError("");
+                setGmailResults([]);
               }}
             >
               <X size={15} />
             </button>
+          )}
+          {gmailResults.length > 0 && (
+            <div className="gmail-results">
+              <table aria-label="Actions updated from Gmail">
+                <thead>
+                  <tr>
+                    <th scope="col">Action ID</th>
+                    <th scope="col">Action Action</th>
+                    <th scope="col">Update</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gmailResults.map((task, index) => (
+                    <tr key={`${task._key}-${index}`}>
+                      <td>{task.ID}</td>
+                      <td>{task.Action}</td>
+                      <td>{task.Update}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}

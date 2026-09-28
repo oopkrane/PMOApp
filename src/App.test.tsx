@@ -209,13 +209,13 @@ describe("Ask PMO persistence", () => {
 });
 
 describe("completed action filtering", () => {
-  it("hides done actions without deleting them", async () => {
+  it("hides done actions by default without deleting them", async () => {
     tasks[2]!.Status = "Done";
     render(<App />);
 
-    expect(await screen.findByText("Action 3")).toBeInTheDocument();
+    await screen.findByText("Action 1");
     const toggle = screen.getByRole("checkbox", { name: /Hide done/i });
-    fireEvent.click(toggle);
+    expect(toggle).toBeChecked();
     expect(screen.queryByText("Action 3")).not.toBeInTheDocument();
     fireEvent.click(toggle);
     expect(screen.getByText("Action 3")).toBeInTheDocument();

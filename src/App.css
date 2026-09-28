@@ -2431,6 +2431,37 @@
 .gmail-status.error {
   border-color: #efced2;
 }
+.gmail-status.has-results {
+  width: min(860px, calc(100vw - 44px));
+}
+.gmail-results {
+  grid-column: 1 / -1;
+  max-height: min(420px, 55vh);
+  overflow: auto;
+}
+.gmail-results table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 12px;
+}
+.gmail-results th,
+.gmail-results td {
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #e9e6ed;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.gmail-results th {
+  position: sticky;
+  top: 0;
+  background: #f6f5f8;
+}
+.gmail-results th:first-child {
+  width: 80px;
+}
 .gmail-status-icon {
   width: 34px;
   height: 34px;
