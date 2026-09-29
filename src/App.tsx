@@ -83,6 +83,7 @@ import {
   COLUMN_NAMES,
   DISPLAY_COLUMNS,
   columnLabel,
+  isCompletedTask,
   type ColumnName,
   type Task,
 } from "./types";
@@ -93,8 +94,6 @@ import {
   type ChatContentBlock,
 } from "./chatFormatting";
 import "./App.css";
-
-const completionPattern = /^(complete|completed|done|closed)$/i;
 
 function uniqueValues(tasks: Task[], column: ColumnName): string[] {
   return [
@@ -243,7 +242,7 @@ function App() {
         return false;
       if (statusFilter !== "All statuses" && task.Status !== statusFilter)
         return false;
-      if (hideDone && completionPattern.test(task.Status.trim())) return false;
+      if (hideDone && isCompletedTask(task)) return false;
       if (
         priorityFilter !== "All priorities" &&
         task.Priority !== priorityFilter
@@ -259,9 +258,7 @@ function App() {
   }, [hideDone, priorityFilter, projectFilter, query, statusFilter, tasks]);
 
   const selectedTask = tasks.find((task) => task._key === selectedKey) ?? null;
-  const completed = tasks.filter((task) =>
-    completionPattern.test(task.Status.trim()),
-  ).length;
+  const completed = tasks.filter((task) => isCompletedTask(task)).length;
   const highPriority = tasks.filter((task) =>
     /high|urgent|critical/i.test(task.Priority),
   ).length;

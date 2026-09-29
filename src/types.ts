@@ -48,4 +48,7 @@ export const CsvRowSchema = z.object({
 export const TaskSchema = CsvRowSchema.extend({ _key: z.string().min(1) });
 export type CsvRow = z.infer<typeof CsvRowSchema>;
 export type Task = z.infer<typeof TaskSchema>;
+export function isCompletedTask(task: Task): boolean {
+  return /^(complete|completed|done|closed)$/i.test(task.Status.trim());
+}
 export const TaskListSchema = z.array(TaskSchema);
