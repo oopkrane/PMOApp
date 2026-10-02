@@ -434,7 +434,7 @@ function App() {
             task._key === decision.taskKey
               ? applyTaskUpdate(
                   { ...task, "Email Subject": email.subject },
-                  `Email: ${decision.update}`,
+                  decision.update,
                   email.receivedAt,
                 )
               : task,
@@ -462,7 +462,7 @@ function App() {
           };
           newTask = applyTaskUpdate(
             newTask,
-            `Email: ${decision.update}`,
+            decision.update,
             email.receivedAt,
           );
           workingTasks = [newTask, ...workingTasks];

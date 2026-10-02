@@ -44,6 +44,63 @@ function mockModel(content: object) {
 }
 
 describe("email-to-action matching", () => {
+  it.each(["", "------------------------------", "__________"])(
+    "uses a review placeholder for empty or separator-only model updates",
+    async (update) => {
+      mockModel({
+        actionId: "",
+        confidence: 0,
+        update,
+        reason: "",
+        newAction: "",
+        priority: "",
+      });
+      expect((await matchEmailToAction(email, [])).update).toBe(
+        "Action update pending review.",
+      );
+    },
+  );
+
+  it("does not save separator-only content after invalid model output", async () => {
+    mockModel({});
+    expect(
+      (await matchEmailToAction({ ...email, content: "----------" }, []))
+        .update,
+    ).toBe("Action update pending review.");
+  });
+
+  it.each([
+    "From: Sender <sender@example.com> Sent: Thursday Subject: Demo",
+    "Please contact sender@example.com for the demo.",
+  ])("rejects email details in model updates", async (update) => {
+    mockModel({
+      actionId: "10",
+      confidence: 1,
+      update,
+      reason: "",
+      newAction: "Review demo request",
+      priority: "",
+    });
+    expect(
+      (await matchEmailToAction({ ...email, content: update }, [task])).update,
+    ).toBe("Action update pending review.");
+  });
+
+  it("does not copy full email text when model output is invalid", async () => {
+    mockModel({});
+    expect(
+      (
+        await matchEmailToAction(
+          {
+            ...email,
+            content: "From: Sender <sender@example.com>\nDemo requested.",
+          },
+          [],
+        )
+      ).update,
+    ).toBe("Action update pending review.");
+  });
+
   it.each(["Done", " done ", "DONE", "Complete", "Completed", "Closed"])(
     "excludes %s actions from candidates and returned matches",
     async (status) => {

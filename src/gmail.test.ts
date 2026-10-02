@@ -6,6 +6,7 @@ import {
   clearCachedGmailToken,
   confirmGmailAccount,
   findUnreadProjectEmails,
+  extractMessageText,
 } from "./gmail";
 
 beforeEach(() => {
@@ -16,6 +17,65 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe("Gmail data boundary", () => {
+  it.each([
+    "------------------------------\nFrom: Sender\nSubject: Sources\nThe source file is attached.",
+    "---------- Forwarded message ---------\nFrom: Sender\nThe source file is attached.",
+    "Please review.\n__________\nFrom: Sender\nThe source file is attached.",
+  ])("preserves forwarded content after separators and headers", (body) => {
+    expect(
+      extractMessageText({
+        mimeType: "text/plain",
+        headers: [{ name: "Subject", value: "Project Fw: Sources" }],
+        body: { data: window.btoa(body) },
+      }),
+    ).toContain("The source file is attached.");
+  });
+
+  it("removes old quoted replies when a new reply exists", () => {
+    expect(
+      extractMessageText({
+        mimeType: "text/plain",
+        body: {
+          data: window.btoa(
+            "Approved.\nOn Monday someone wrote:\nOld request.",
+          ),
+        },
+      }),
+    ).toBe("Approved.");
+  });
+
+  it("uses HTML when the plain part contains only a separator", () => {
+    expect(
+      extractMessageText({
+        parts: [
+          {
+            mimeType: "text/plain",
+            body: { data: window.btoa("____________") },
+          },
+          {
+            mimeType: "text/html",
+            body: {
+              data: window.btoa(
+                "<div>Approved.</div><div>On Monday someone wrote:</div><p>Old request.</p>",
+              ),
+            },
+          },
+        ],
+      }),
+    ).toBe("Approved.");
+  });
+
+  it("ignores separator-only messages", () => {
+    expect(
+      extractMessageText({
+        mimeType: "text/plain",
+        body: {
+          data: window.btoa("-----------------------------"),
+        },
+      }),
+    ).toBe("");
+  });
+
   it("reuses a valid token without forcing repeated consent", async () => {
     const prompts: Array<string | undefined> = [];
     const initTokenClient = vi.fn(

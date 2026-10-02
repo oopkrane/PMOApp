@@ -226,14 +226,22 @@ function headerValue(payload: GmailPart | undefined, name: string): string {
   );
 }
 
-function extractMessageText(payload: GmailPart | undefined): string {
+export function extractMessageText(payload: GmailPart | undefined): string {
   if (!payload) return "";
   const plainParts: string[] = [];
   const htmlParts: string[] = [];
   collectParts(payload, plainParts, htmlParts);
-  const plainText = plainParts.join("\n").trim();
-  const text = plainText || htmlToText(htmlParts.join("\n"));
-  return removeQuotedReplies(text).slice(0, 16_000);
+  for (const text of [
+    plainParts.join("\n"),
+    htmlToText(htmlParts.join("\n")),
+  ]) {
+    const content = removeQuotedReplies(
+      text,
+      /\b(?:fw|fwd)\s*:/i.test(headerValue(payload, "Subject")),
+    );
+    if (/[\p{L}\p{N}]/u.test(content)) return content.slice(0, 16_000);
+  }
+  return "";
 }
 
 function collectParts(part: GmailPart, plain: string[], html: string[]): void {
@@ -258,13 +266,29 @@ function htmlToText(html: string): string {
   document
     .querySelectorAll("script, style, template")
     .forEach((element) => element.remove());
-  return document.body.textContent?.replace(/\s+/g, " ").trim() ?? "";
+  document
+    .querySelectorAll("br")
+    .forEach((element) => element.replaceWith("\n"));
+  document.querySelectorAll("div, p, tr, li, blockquote").forEach((element) => {
+    element.prepend("\n");
+    element.append("\n");
+  });
+  return document.body.textContent ?? "";
 }
 
-function removeQuotedReplies(text: string): string {
-  const marker =
-    /\n(?:On .+ wrote:|From:\s|_{5,}|-{5,}\s*Original Message\s*-{5,})/i;
-  return text.replace(/\r/g, "").split(marker)[0]?.trim() ?? "";
+function removeQuotedReplies(text: string, isForward = false): string {
+  const cleaned = text
+    .replace(/\r/g, "")
+    .replace(/^\s*[-_=–—]{5,}\s*$/gm, "")
+    .trim();
+  // A forwarded message is the content being shared, not a quoted reply.
+  const marker = /^(?:On .+ wrote:|From:\s|[-\s]*Original Message[-\s]*$)/im;
+  const latest = cleaned.split(marker)[0]?.trim() ?? "";
+  const forwarded =
+    /^\s*-*\s*(?:Forwarded message|Begin forwarded message)/im.test(cleaned);
+  return isForward || forwarded || !/[\p{L}\p{N}]/u.test(latest)
+    ? cleaned
+    : latest;
 }
 
 async function waitForGoogleIdentity(): Promise<NonNullable<Window["google"]>> {
