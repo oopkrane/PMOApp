@@ -124,6 +124,7 @@
   overflow-y: auto;
 }
 .section-label {
+  align-items: center;
   display: flex;
   justify-content: space-between;
   padding: 0 9px 7px;
@@ -132,6 +133,30 @@
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+}
+.project-create-form {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.project-create-form input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #d8d5df;
+  border-radius: 6px;
+  background: white;
+}
+.project-create-form > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.project-create-form p {
+  margin: 0;
+  color: #b42318;
 }
 .project-link {
   min-height: 34px;

@@ -38,6 +38,7 @@ import {
   saveTasks,
 } from "./data";
 import { nextSequentialId } from "./ids";
+import { loadProjects, saveProjects } from "./projects";
 import { matchEmailToAction } from "./emailMatcher";
 import {
   authorizeGmail,
@@ -185,6 +186,10 @@ function App() {
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState("");
   const [meetingOpen, setMeetingOpen] = useState(false);
+  const [savedProjects, setSavedProjects] = useState(loadProjects);
+  const [addingProject, setAddingProject] = useState(false);
+  const [projectName, setProjectName] = useState("");
+  const [projectError, setProjectError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -231,7 +236,13 @@ function App() {
     return () => window.clearTimeout(timeout);
   }, [notice]);
 
-  const projects = useMemo(() => uniqueValues(tasks, "Project"), [tasks]);
+  const projects = useMemo(
+    () =>
+      [...new Set([...savedProjects, ...uniqueValues(tasks, "Project")])].sort(
+        (a, b) => a.localeCompare(b),
+      ),
+    [savedProjects, tasks],
+  );
   const owners = useMemo(() => uniqueValues(tasks, "Owner"), [tasks]);
   const statuses = useMemo(() => uniqueValues(tasks, "Status"), [tasks]);
   const priorities = useMemo(() => uniqueValues(tasks, "Priority"), [tasks]);
@@ -304,6 +315,37 @@ function App() {
     setPage("workspace");
     if (project !== projectFilter) setQuery("");
     setProjectFilter(project);
+  }
+
+  function createProject() {
+    const name = projectName.trim();
+    if (!name) {
+      setProjectError("Enter a project name.");
+      return;
+    }
+    if (
+      ["All projects", ...projects].some(
+        (project) => project.toLowerCase() === name.toLowerCase(),
+      )
+    ) {
+      setProjectError("A project with this name already exists.");
+      return;
+    }
+    const nextProjects = [...savedProjects, name];
+    try {
+      saveProjects(nextProjects);
+    } catch {
+      setProjectError("Could not save the project. Please try again.");
+      return;
+    }
+    setSavedProjects(nextProjects);
+    setAddingProject(false);
+    setProjectName("");
+    setProjectError("");
+    setStatusFilter("All statuses");
+    setPriorityFilter("All priorities");
+    selectProject(name);
+    setNotice("Project created");
   }
 
   function deleteTask(key: string) {
@@ -460,11 +502,7 @@ function App() {
                 /not started|to do|open/i.test(status),
               ) ?? "",
           };
-          newTask = applyTaskUpdate(
-            newTask,
-            decision.update,
-            email.receivedAt,
-          );
+          newTask = applyTaskUpdate(newTask, decision.update, email.receivedAt);
           workingTasks = [newTask, ...workingTasks];
           created += 1;
           setGmailResults((results) => [...results, newTask]);
@@ -694,8 +732,64 @@ function App() {
         <div className="sidebar-section">
           <div className="section-label">
             <span>Projects</span>
-            <Plus size={14} />
+            <button
+              className="icon-button"
+              aria-label="Add project"
+              title="Add project"
+              aria-expanded={addingProject}
+              onClick={() => {
+                setAddingProject((open) => !open);
+                setProjectName("");
+                setProjectError("");
+              }}
+            >
+              <Plus size={14} />
+            </button>
           </div>
+          {addingProject && (
+            <form
+              className="project-create-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                createProject();
+              }}
+            >
+              <label htmlFor="new-project-name">Project name</label>
+              <input
+                id="new-project-name"
+                autoFocus
+                value={projectName}
+                aria-invalid={!!projectError}
+                aria-describedby={
+                  projectError ? "project-create-error" : undefined
+                }
+                onChange={(event) => {
+                  setProjectName(event.target.value);
+                  setProjectError("");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") setAddingProject(false);
+                }}
+              />
+              {projectError && (
+                <p id="project-create-error" role="alert">
+                  {projectError}
+                </p>
+              )}
+              <div>
+                <button className="primary-button" type="submit">
+                  Create project
+                </button>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => setAddingProject(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
           <button
             className={`project-link ${projectFilter === "All projects" ? "selected" : ""}`}
             onClick={() => selectProject("All projects")}

@@ -122,6 +122,43 @@ beforeEach(() => {
 
 afterEach(() => cleanup());
 
+describe("Project creation", () => {
+  it("creates an empty project, restores it, and assigns new actions to it", async () => {
+    const first = render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "Add project" }));
+    fireEvent.change(screen.getByLabelText("Project name"), {
+      target: { value: "  New delivery  " },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create project" }));
+    expect(
+      screen.getByRole("button", { name: /New delivery\s*0/ }),
+    ).toHaveClass("selected");
+    first.unmount();
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: /New delivery\s*0/ }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /New action/i }));
+    expect(
+      screen.getByRole("button", { name: /New delivery\s*1/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("validates names and allows cancelling without creating a project", async () => {
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "Add project" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create project" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("Enter a project name");
+    fireEvent.change(screen.getByLabelText("Project name"), {
+      target: { value: "project a" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create project" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("already exists");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByLabelText("Project name")).not.toBeInTheDocument();
+  });
+});
+
 describe("AI Focus view persistence", () => {
   it("restores the generated board after the application remounts", async () => {
     const firstRender = render(<App />);
